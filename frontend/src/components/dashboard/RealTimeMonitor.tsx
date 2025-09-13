@@ -42,21 +42,25 @@ const riskLevelColors = {
   critical: '#EF4444'
 };
 
-// Mock data generator
+// Deterministic mock data generator to avoid hydration issues
+let mockCounter = 0;
 const generateMockAttack = (): AttackEvent => {
   const models = ['Command R+', 'Gemini Pro', 'GPT-4 Turbo', 'Claude-3 Opus', 'Llama-3.3 70B'];
   const attackTypeKeys = Object.keys(attackTypes) as Array<keyof typeof attackTypes>;
   const statuses: AttackEvent['status'][] = ['success', 'partial', 'blocked', 'processing'];
   const riskLevels: AttackEvent['riskLevel'][] = ['low', 'medium', 'high', 'critical'];
 
+  // Use counter for deterministic selection to avoid hydration mismatch
+  mockCounter += 1;
+
   return {
-    id: Math.random().toString(36).substr(2, 9),
+    id: `mock-${mockCounter}-${Date.now()}`,
     timestamp: new Date(),
-    targetModel: models[Math.floor(Math.random() * models.length)],
-    attackType: attackTypeKeys[Math.floor(Math.random() * attackTypeKeys.length)],
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-    riskLevel: riskLevels[Math.floor(Math.random() * riskLevels.length)],
-    payload: Math.random() > 0.7 ? "Attempting role-play bypass..." : undefined
+    targetModel: models[mockCounter % models.length],
+    attackType: attackTypeKeys[mockCounter % attackTypeKeys.length],
+    status: statuses[mockCounter % statuses.length],
+    riskLevel: riskLevels[mockCounter % riskLevels.length],
+    payload: (mockCounter % 3) === 0 ? "Attempting role-play bypass..." : undefined
   };
 };
 
@@ -79,13 +83,14 @@ export const RealTimeMonitor = () => {
       const newAttack = generateMockAttack();
       setAttacks(prev => [newAttack, ...prev].slice(0, 20)); // Keep only latest 20
 
-      // Update metrics
+      // Update metrics with deterministic values based on counter
+      const metricsVariation = mockCounter % 10;
       setMetrics(prev => ({
-        attacksPerSecond: Math.random() * 5 + 1,
-        avgResponseTime: Math.random() * 200 + 50,
-        queueDepth: Math.floor(Math.random() * 15) + 1
+        attacksPerSecond: 1 + (metricsVariation * 0.5),
+        avgResponseTime: 50 + (metricsVariation * 20),
+        queueDepth: 1 + (metricsVariation % 15)
       }));
-    }, 1500 + Math.random() * 1000); // Random interval between 1.5-2.5 seconds
+    }, 2000); // Fixed interval to avoid hydration issues
 
     return () => clearInterval(interval);
   }, [isActive]);

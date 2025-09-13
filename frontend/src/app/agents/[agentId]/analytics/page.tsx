@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import CountUp from "react-countup";
+import dynamic from "next/dynamic";
+
+const CountUp = dynamic(() => import("react-countup"), {
+  ssr: false,
+  loading: () => <span>0</span>
+});
 import Link from "next/link";
 import {
   IconShield,
