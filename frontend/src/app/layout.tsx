@@ -5,6 +5,7 @@ import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { MainLayout } from "~/components/layout/main-layout";
+import { AuthSessionProvider } from "~/components/auth/session-provider";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -23,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable} dark`}>
       <body>
-        <MainLayout>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </MainLayout>
+        <AuthSessionProvider>
+          <MainLayout>
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </MainLayout>
+        </AuthSessionProvider>
       </body>
     </html>
   );
