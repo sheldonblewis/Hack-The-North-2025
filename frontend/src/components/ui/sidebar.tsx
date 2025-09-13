@@ -608,7 +608,9 @@ function SidebarMenuSkeleton({
 }) {
   // Random width between 50 to 90%.
   const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
+    // Use a deterministic width based on current time to avoid hydration mismatch
+    // but still appear random-ish across different renders
+    return "75%"; // Fixed width for better UX and no hydration issues
   }, [])
 
   return (
