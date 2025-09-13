@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { IconCirclePlusFilled, type Icon } from "@tabler/icons-react"
+import { type Icon } from "@tabler/icons-react"
 import { useAgent } from "~/contexts/agent-context"
 import {
   SidebarGroup,

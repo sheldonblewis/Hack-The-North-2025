@@ -305,21 +305,6 @@ export default function AgentAnalytics({
     <div className="flex flex-col gap-4 md:gap-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link
-            href={`/agents/${agentId}`}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <IconArrowLeft className="w-5 h-5" />
-            Back to Agent
-          </Link>
-          <div className="h-6 w-px bg-border" />
-          <div>
-            <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Agent {agentId} • Real-time AI security monitoring</p>
-          </div>
-        </div>
-
         <div className="flex items-center gap-3">
           <Button
             onClick={() => setIsSimulating(!isSimulating)}

@@ -44,109 +44,102 @@ export default async function AgentsPage() {
   }
   
   return (
-    <main className="min-h-screen bg-background text-foreground p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-light tracking-tight mb-2">Agents</h1>
-          <p className="text-muted-foreground">
-            {session.user.name || session.user.email}
-          </p>
-        </div>
+    <div className="max-w-6xl mx-auto">
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-8 mb-12">
-          <div className="space-y-2">
-            <div className="text-2xl font-light">{AGENTS.length}</div>
-            <div className="text-sm text-muted-foreground">Total Agents</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-2xl font-light text-green-500">
-              {AGENTS.filter(a => a.isActive).length}
-            </div>
-            <div className="text-sm text-muted-foreground">Active</div>
-          </div>
-          <div className="space-y-2">
-            <div className="text-2xl font-light text-red-500">
-              {AGENTS.filter(a => !a.isActive).length}
-            </div>
-            <div className="text-sm text-muted-foreground">In Testing</div>
-          </div>
-        </div>
 
-        {/* Agents Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {AGENTS.map((agent) => (
-            <Card key={agent.id} className="group border-border bg-card hover:bg-accent/5 transition-colors duration-200">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <Bot className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg font-medium">{agent.name}</CardTitle>
-                      <div className="text-xs text-muted-foreground mt-1">{agent.category}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Circle 
-                      className={`h-2 w-2 fill-current ${
-                        agent.isActive ? 'text-green-500' : 'text-red-500'
-                      }`} 
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      {agent.status}
-                    </span>
-                  </div>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                <CardDescription className="text-sm text-muted-foreground leading-relaxed">
-                  {agent.description}
-                </CardDescription>
-                
-                <div className="text-xs text-muted-foreground">
-                  Last tested: {agent.lastTested}
-                </div>
-                
-                <div className="flex gap-2 pt-2">
-                  <Link href={`/agents/${agent.id}`} className="flex-1">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="w-full border-border hover:bg-accent hover:text-accent-foreground"
-                    >
-                      View
-                    </Button>
-                  </Link>
-                  <Link href={`/agents/${agent.id}/runs/new`}>
-                    <Button 
-                      size="sm" 
-                      className="bg-red-600 hover:bg-red-700 text-white border-0"
-                    >
-                      Test
-                      <ArrowRight className="h-3 w-3 ml-1" />
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-8 mb-12">
+        <div className="space-y-2">
+          <div className="text-2xl font-light">{AGENTS.length}</div>
+          <div className="text-sm text-muted-foreground">Total Agents</div>
         </div>
-
-        {/* Add New Agent */}
-        <div className="mt-12 pt-8 border-t border-border">
-          <Button 
-            variant="outline" 
-            className="w-full h-16 border-dashed border-border hover:bg-accent/5 hover:border-accent-foreground/20"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add New Agent
-          </Button>
+        <div className="space-y-2">
+          <div className="text-2xl font-light text-green-500">
+            {AGENTS.filter(a => a.isActive).length}
+          </div>
+          <div className="text-sm text-muted-foreground">Active</div>
+        </div>
+        <div className="space-y-2">
+          <div className="text-2xl font-light text-red-500">
+            {AGENTS.filter(a => !a.isActive).length}
+          </div>
+          <div className="text-sm text-muted-foreground">In Testing</div>
         </div>
       </div>
-    </main>
+
+      {/* Agents Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {AGENTS.map((agent) => (
+          <Card key={agent.id} className="group border-border bg-card hover:bg-accent/5 transition-colors duration-200">
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                    <Bot className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-medium">{agent.name}</CardTitle>
+                    <div className="text-xs text-muted-foreground mt-1">{agent.category}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Circle 
+                    className={`h-2 w-2 fill-current ${
+                      agent.isActive ? 'text-green-500' : 'text-red-500'
+                    }`} 
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    {agent.status}
+                  </span>
+                </div>
+              </div>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <CardDescription className="text-sm text-muted-foreground leading-relaxed">
+                {agent.description}
+              </CardDescription>
+              
+              <div className="text-xs text-muted-foreground">
+                Last tested: {agent.lastTested}
+              </div>
+              
+              <div className="flex gap-2 pt-2">
+                <Link href={`/agents/${agent.id}`} className="flex-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full border-border hover:bg-accent hover:text-accent-foreground"
+                  >
+                    View
+                  </Button>
+                </Link>
+                <Link href={`/agents/${agent.id}/runs/new`}>
+                  <Button 
+                    size="sm" 
+                    className="bg-red-600 hover:bg-red-700 text-white border-0"
+                  >
+                    Test
+                    <ArrowRight className="h-3 w-3 ml-1" />
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Add New Agent */}
+      <div className="mt-12 pt-8 border-t border-border">
+        <Button 
+          variant="outline" 
+          className="w-full h-16 border-dashed border-border hover:bg-accent/5 hover:border-accent-foreground/20"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add New Agent
+        </Button>
+      </div>
+    </div>
+    
   );
 }
