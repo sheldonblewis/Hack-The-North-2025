@@ -63,6 +63,8 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    agents        Agent[]
+    testRuns      TestRun[]
 }
 
 model VerificationToken {
@@ -71,4 +73,72 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+// AI Red Teaming Models
+model Agent {
+    id          String    @id @default(cuid())
+    name        String
+    description String?
+    endpoint    String
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    
+    testRuns    TestRun[]
+    
+    createdBy   User      @relation(fields: [createdById], references: [id])
+    createdById String
+    
+    @@index([name])
+}
+
+model TestRun {
+    id                String      @id @default(cuid())
+    name              String
+    description       String?
+    targetEndpoint    String
+    status            TestStatus  @default(PENDING)
+    
+    // Configuration
+    selectedRisks     String[]    // JSON array of risk category IDs
+    selectedAttacks   String[]    // JSON array of attack strategy IDs
+    numPrompts        Int         @default(100)
+    timeout           Int         @default(30)
+    concurrency       Int         @default(5)
+    customPrompts     String?     // Custom seed prompts
+    successThreshold  Float       @default(5.0)
+    enableLogging     Boolean     @default(true)
+    generateReport    Boolean     @default(true)
+    
+    // Results
+    totalPrompts      Int?
+    successfulAttacks Int?
+    attackSuccessRate Float?
+    reportUrl         String?
+    logUrl            String?
+    
+    // Timestamps
+    createdAt         DateTime    @default(now())
+    updatedAt         DateTime    @updatedAt
+    startedAt         DateTime?
+    completedAt       DateTime?
+    
+    // Relations
+    agent             Agent       @relation(fields: [agentId], references: [id], onDelete: Cascade)
+    agentId           String
+    
+    createdBy         User        @relation(fields: [createdById], references: [id])
+    createdById       String
+    
+    @@index([agentId])
+    @@index([status])
+    @@index([createdAt])
+}
+
+enum TestStatus {
+    PENDING
+    RUNNING
+    COMPLETED
+    FAILED
+    CANCELLED
 }

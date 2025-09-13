@@ -17,7 +17,7 @@ import {
   IconTrendingUp,
   IconTrendingDown,
   IconMinus,
-  IconPlay,
+  IconPlayerPlay,
   IconPlayerPause,
   IconDownload,
   IconArrowLeft
@@ -325,7 +325,7 @@ export default function AgentAnalytics({
             onClick={() => setIsSimulating(!isSimulating)}
             variant={isSimulating ? "outline" : "default"}
           >
-            {isSimulating ? <IconPlayerPause className="w-4 h-4 mr-2" /> : <IconPlay className="w-4 h-4 mr-2" />}
+            {isSimulating ? <IconPlayerPause className="w-4 h-4 mr-2" /> : <IconPlayerPlay className="w-4 h-4 mr-2" />}
             {isSimulating ? 'Pause' : 'Start'} Simulation
           </Button>
 
