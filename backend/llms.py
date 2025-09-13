@@ -35,7 +35,7 @@ def cohere_embeddings():
     return
 
 
-def cerebras_stream_chat(prompt: str, system_prompt: str = None):
+def cerebras_stream_chat(prompt: str, system_prompt: str = None, model_name :str = "llama-4-scout-17b-16e-instruct"):
     messages_list = []
     if system_prompt:
         messages_list.append({"role": "system", "content": system_prompt})
@@ -44,7 +44,7 @@ def cerebras_stream_chat(prompt: str, system_prompt: str = None):
 
     stream = cereb.chat.completions.create(
         messages=messages_list,
-        model="llama-4-scout-17b-16e-instruct",
+        model=model_name,
         stream=True,
         max_completion_tokens=20000,
         temperature=1,

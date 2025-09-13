@@ -77,5 +77,5 @@ class DefenseAgent:
     messages = []
 
     def ask(self, attack_message):
-        output = llms.cerebras_stream_chat(prompt = attack_message, system_prompt=self.system_prompt)
+        output = llms.cerebras_stream_chat(prompt = attack_message, system_prompt=self.system_prompt, model_name="llama3.1-8b")
         return output
