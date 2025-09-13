@@ -28,6 +28,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~/components/ui/sidebar"
+import { handleSignOut } from "~/lib/auth-actions"
 
 export function NavUser({
   user,
@@ -98,10 +99,14 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <IconLogout />
-              Log out
-            </DropdownMenuItem>
+            <form action={handleSignOut}>
+              <DropdownMenuItem asChild>
+                <button type="submit" className="flex w-full items-center gap-2">
+                  <IconLogout />
+                  Log out
+                </button>
+              </DropdownMenuItem>
+            </form>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

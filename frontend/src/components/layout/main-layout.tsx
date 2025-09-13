@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { usePathname } from "next/navigation"
 import { AgentProvider } from "~/contexts/agent-context"
 import { AppSidebar } from "~/components/app-sidebar"
 import { SiteHeader } from "~/components/site-header"
@@ -14,6 +15,21 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
+  const pathname = usePathname()
+  const hideSidebar = pathname === "/" || pathname === "/login"
+
+  if (hideSidebar) {
+    return (
+      <AgentProvider>
+        <div className="flex flex-1 flex-col">
+          <div className="@container/main flex flex-1 flex-col gap-2">
+            {children}
+          </div>
+        </div>
+      </AgentProvider>
+    )
+  }
+
   return (
     <AgentProvider>
       <SidebarProvider
