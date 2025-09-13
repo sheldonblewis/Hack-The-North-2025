@@ -95,10 +95,10 @@ export default function AgentChat({
 
   const getFlagColor = (severity: string) => {
     switch (severity) {
-      case 'high': return 'text-red-600 bg-red-100';
-      case 'medium': return 'text-yellow-600 bg-yellow-100';
-      case 'low': return 'text-orange-600 bg-orange-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'high': return { color: 'var(--color-risk-critical)', backgroundColor: 'var(--color-risk-critical)20' };
+      case 'medium': return { color: 'var(--color-risk-high)', backgroundColor: 'var(--color-risk-high)20' };
+      case 'low': return { color: 'var(--color-risk-medium)', backgroundColor: 'var(--color-risk-medium)20' };
+      default: return { color: 'var(--color-text-secondary)', backgroundColor: 'var(--color-primary-700)' };
     }
   };
 
@@ -116,33 +116,29 @@ export default function AgentChat({
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen" style={{ background: 'var(--color-primary-900)' }}>
       {/* Header */}
-      <div className="bg-white border-b px-6 py-4">
+      <div className="border-b px-6 py-4" style={{ borderColor: 'var(--color-primary-700)', backgroundColor: 'var(--color-primary-800)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href={`/agents/${agentId}`}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
               Back to Agent
             </Link>
-            <div className="h-6 w-px bg-gray-300" />
-            <h1 className="text-xl font-semibold text-gray-900">
+            <div className="h-6 w-px bg-gray-600" />
+            <h1 className="text-3xl font-bold text-white">
               Red Team Simulation
             </h1>
-            <span className="text-sm text-gray-500">Agent ID: {agentId}</span>
+            <span className="text-sm text-gray-400">Agent {agentId}</span>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsSimulating(!isSimulating)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                isSimulating
-                  ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                  : 'bg-green-100 text-green-700 hover:bg-green-200'
-              }`}
+              className={`action-button ${isSimulating ? 'secondary' : ''}`}
             >
               {isSimulating ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
               {isSimulating ? 'Pause' : 'Start'} Simulation
@@ -150,7 +146,7 @@ export default function AgentChat({
 
             <button
               onClick={() => setMessages(mockMessages)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="action-button secondary"
             >
               <RotateCcw className="h-4 w-4" />
               Reset
@@ -163,28 +159,28 @@ export default function AgentChat({
         {/* Chat Interface */}
         <div className="flex-1 flex flex-col">
           {/* Agents Header */}
-          <div className="bg-white border-b px-6 py-4">
+          <div className="border-b px-6 py-4" style={{ backgroundColor: 'var(--color-primary-800)', borderColor: 'var(--color-primary-700)' }}>
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-2 bg-red-50 rounded-lg">
-                  <Bot className="h-5 w-5 text-red-600" />
-                  <span className="font-medium text-red-800">Attack Agent</span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-risk-critical)20', border: '1px solid var(--color-risk-critical)30' }}>
+                  <Bot className="h-5 w-5" style={{ color: 'var(--color-risk-critical)' }} />
+                  <span className="font-medium text-white">Attack Agent</span>
                 </div>
                 <span className="text-gray-400">vs</span>
-                <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg">
-                  <Shield className="h-5 w-5 text-blue-600" />
-                  <span className="font-medium text-blue-800">Defense Agent</span>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-accent-cyan)20', border: '1px solid var(--color-accent-cyan)30' }}>
+                  <Shield className="h-5 w-5" style={{ color: 'var(--color-accent-cyan)' }} />
+                  <span className="font-medium text-white">Defense Agent</span>
                 </div>
               </div>
 
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-gray-400">
                 {messages.length} total exchanges
               </div>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6" style={{ backgroundColor: 'var(--color-primary-900)' }}>
             <AnimatePresence>
               {messages.map((message, index) => (
                 <motion.div
@@ -199,47 +195,53 @@ export default function AgentChat({
                     <div className={`flex items-center gap-2 mb-2 ${
                       message.role === 'defender' ? 'justify-end' : 'justify-start'
                     }`}>
-                      {message.role === 'attacker' && <Bot className="h-4 w-4 text-red-600" />}
+                      {message.role === 'attacker' && <Bot className="h-4 w-4" style={{ color: 'var(--color-risk-critical)' }} />}
                       <span className={`text-sm font-medium ${
-                        message.role === 'attacker' ? 'text-red-700' : 'text-blue-700'
+                        message.role === 'attacker' ? 'text-white' : 'text-white'
                       }`}>
                         {message.role === 'attacker' ? 'Attack Agent' : 'Defense Agent'}
                       </span>
-                      {message.role === 'defender' && <Shield className="h-4 w-4 text-blue-600" />}
+                      {message.role === 'defender' && <Shield className="h-4 w-4" style={{ color: 'var(--color-accent-cyan)' }} />}
                     </div>
 
                     {/* Message Bubble */}
-                    <div className={`relative rounded-2xl px-4 py-3 ${
-                      message.role === 'attacker'
-                        ? 'bg-red-100 text-red-900'
-                        : 'bg-blue-100 text-blue-900'
-                    }`}>
+                    <div className={`relative rounded-2xl px-4 py-3`}
+                      style={{
+                        backgroundColor: message.role === 'attacker'
+                          ? 'var(--color-risk-critical)15'
+                          : 'var(--color-accent-cyan)15',
+                        border: message.role === 'attacker'
+                          ? '1px solid var(--color-risk-critical)30'
+                          : '1px solid var(--color-accent-cyan)30'
+                      }}>
                       {/* Flag Indicator */}
                       {message.flag && (
                         <div className="absolute -left-2 top-2">
-                          <div className={`rounded-full p-1 ${getFlagColor(message.flag.severity)}`}>
+                          <div className="rounded-full p-1" style={getFlagColor(message.flag.severity)}>
                             <AlertTriangle className="h-3 w-3" />
                           </div>
                         </div>
                       )}
 
-                      <p className="text-sm leading-relaxed">{message.content}</p>
+                      <p className="text-sm leading-relaxed text-white">{message.content}</p>
 
                       {/* Message Footer */}
-                      <div className={`flex items-center justify-between mt-2 text-xs ${
-                        message.role === 'attacker' ? 'text-red-600' : 'text-blue-600'
-                      }`}>
+                      <div className="flex items-center justify-between mt-2 text-xs text-gray-300">
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {formatTime(message.timestamp)}
                         </div>
 
                         {message.status && (
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            message.status === 'success' ? 'bg-green-200 text-green-800' :
-                            message.status === 'failed' ? 'bg-red-200 text-red-800' :
-                            'bg-yellow-200 text-yellow-800'
-                          }`}>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium`}
+                            style={{
+                              backgroundColor: message.status === 'success' ? 'var(--color-accent-emerald)20' :
+                                             message.status === 'failed' ? 'var(--color-risk-critical)20' :
+                                             'var(--color-risk-medium)20',
+                              color: message.status === 'success' ? 'var(--color-accent-emerald)' :
+                                     message.status === 'failed' ? 'var(--color-risk-critical)' :
+                                     'var(--color-risk-medium)'
+                            }}>
                             {message.status}
                           </span>
                         )}
@@ -247,8 +249,8 @@ export default function AgentChat({
 
                       {/* Flag Details */}
                       {message.flag && (
-                        <div className="mt-2 pt-2 border-t border-gray-200">
-                          <div className="text-xs text-gray-600">
+                        <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--color-primary-600)' }}>
+                          <div className="text-xs text-gray-300">
                             <span className="font-medium">Flag:</span> {message.flag.description}
                           </div>
                         </div>
@@ -263,69 +265,69 @@ export default function AgentChat({
         </div>
 
         {/* Sidebar - Attack Statistics */}
-        <div className="w-80 bg-white border-l p-6">
-          <h3 className="font-semibold text-gray-900 mb-4">Attack Analysis</h3>
+        <div className="w-80 border-l p-6" style={{ backgroundColor: 'var(--color-primary-800)', borderColor: 'var(--color-primary-700)' }}>
+          <h3 className="font-semibold text-white mb-4">Attack Analysis</h3>
 
           <div className="space-y-4">
             {/* Success Rate */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="text-sm font-medium text-gray-700 mb-2">Success Rate</div>
-              <div className="text-2xl font-bold text-red-600">0%</div>
-              <div className="text-xs text-gray-500">0 successful jailbreaks</div>
+            <div className="dashboard-card p-4">
+              <div className="text-sm font-medium text-gray-300 mb-2">Success Rate</div>
+              <div className="text-2xl font-bold font-mono" style={{ color: 'var(--color-risk-critical)' }}>0%</div>
+              <div className="text-xs text-gray-400">0 successful jailbreaks</div>
             </div>
 
             {/* Attack Types */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="text-sm font-medium text-gray-700 mb-3">Attack Types</div>
+            <div className="dashboard-card p-4">
+              <div className="text-sm font-medium text-gray-300 mb-3">Attack Types</div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span>Jailbreak Attempts</span>
-                  <span className="font-medium">2</span>
+                  <span className="text-gray-400">Jailbreak Attempts</span>
+                  <span className="font-medium font-mono text-white">2</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Prompt Injection</span>
-                  <span className="font-medium">1</span>
+                  <span className="text-gray-400">Prompt Injection</span>
+                  <span className="font-medium font-mono text-white">1</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Role Playing</span>
-                  <span className="font-medium">1</span>
+                  <span className="text-gray-400">Role Playing</span>
+                  <span className="font-medium font-mono text-white">1</span>
                 </div>
               </div>
             </div>
 
             {/* Severity Distribution */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="text-sm font-medium text-gray-700 mb-3">Threat Levels</div>
+            <div className="dashboard-card p-4">
+              <div className="text-sm font-medium text-gray-300 mb-3">Threat Levels</div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-red-400 rounded-full"></div>
-                    <span className="text-sm">High</span>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--color-risk-critical)' }}></div>
+                    <span className="text-sm text-gray-400">High</span>
                   </div>
-                  <span className="text-sm font-medium">1</span>
+                  <span className="text-sm font-medium font-mono text-white">1</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                    <span className="text-sm">Medium</span>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--color-risk-high)' }}></div>
+                    <span className="text-sm text-gray-400">Medium</span>
                   </div>
-                  <span className="text-sm font-medium">1</span>
+                  <span className="text-sm font-medium font-mono text-white">1</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                    <span className="text-sm">Low</span>
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--color-accent-emerald)' }}></div>
+                    <span className="text-sm text-gray-400">Low</span>
                   </div>
-                  <span className="text-sm font-medium">0</span>
+                  <span className="text-sm font-medium font-mono text-white">0</span>
                 </div>
               </div>
             </div>
 
             {/* Quick Actions */}
-            <div className="pt-4 border-t">
+            <div className="pt-4" style={{ borderTop: '1px solid var(--color-primary-600)' }}>
               <button
                 onClick={simulateNewMessage}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                className="action-button w-full"
               >
                 Simulate Next Exchange
               </button>

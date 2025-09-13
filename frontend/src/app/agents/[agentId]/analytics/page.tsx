@@ -5,21 +5,31 @@ import { motion } from "framer-motion";
 import CountUp from "react-countup";
 import Link from "next/link";
 import {
-  ShieldCheckIcon,
-  ExclamationTriangleIcon,
-  CpuChipIcon,
-  ChartBarIcon,
-  ArrowTrendingUpIcon as TrendingUpIcon,
-  ArrowTrendingDownIcon as TrendingDownIcon,
-  MinusIcon,
-  PlayIcon,
-  PauseIcon,
-  ArrowDownTrayIcon,
-  ArrowLeftIcon
-} from "@heroicons/react/24/outline";
+  IconShield,
+  IconAlertTriangle,
+  IconCpu,
+  IconChartBar,
+  IconTrendingUp,
+  IconTrendingDown,
+  IconMinus,
+  IconPlay,
+  IconPlayerPause,
+  IconDownload,
+  IconArrowLeft
+} from "@tabler/icons-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
 import { VulnerabilityHeatmap } from "../../../../components/dashboard/VulnerabilityHeatmap";
 import { RealTimeMonitor } from "../../../../components/dashboard/RealTimeMonitor";
+import { Badge } from "../../../../components/ui/badge";
+import { Button } from "../../../../components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../../components/ui/card";
 
 // Types
 interface MetricData {
@@ -27,8 +37,6 @@ interface MetricData {
   value: number;
   change: number;
   trend: 'up' | 'down' | 'neutral';
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
 }
 
 interface RiskTrendData {
@@ -51,33 +59,25 @@ const mockMetrics: MetricData[] = [
     label: "Overall Risk Score",
     value: 23,
     change: -12,
-    trend: 'down',
-    icon: ShieldCheckIcon,
-    color: "var(--color-risk-low)"
+    trend: 'down'
   },
   {
     label: "Models Tested",
     value: 47,
     change: 8,
-    trend: 'up',
-    icon: CpuChipIcon,
-    color: "var(--color-accent-cyan)"
+    trend: 'up'
   },
   {
     label: "Active Attacks",
     value: 156,
     change: 0,
-    trend: 'neutral',
-    icon: ExclamationTriangleIcon,
-    color: "var(--color-accent-violet)"
+    trend: 'neutral'
   },
   {
     label: "Jailbreak Success Rate",
     value: 3.2,
     change: -1.5,
-    trend: 'down',
-    icon: ChartBarIcon,
-    color: "var(--color-risk-critical)"
+    trend: 'down'
   }
 ];
 
@@ -101,34 +101,34 @@ const mockAttackTypes: AttackTypeData[] = [
 
 // Components
 const MetricCard = ({ metric }: { metric: MetricData }) => {
-  const TrendIcon = metric.trend === 'up' ? TrendingUpIcon :
-                   metric.trend === 'down' ? TrendingDownIcon : MinusIcon;
+  const TrendIcon = metric.trend === 'up' ? IconTrendingUp :
+                   metric.trend === 'down' ? IconTrendingDown : IconMinus;
 
   return (
     <motion.div
-      className="dashboard-card metric-card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="flex items-start justify-between mb-4">
-        <metric.icon className="w-8 h-8" style={{ color: metric.color }} />
-        <div className={`metric-change ${metric.trend}`}>
-          <TrendIcon className="w-4 h-4" />
-          <span>{Math.abs(metric.change)}{metric.label.includes('Rate') ? '%' : ''}</span>
-        </div>
-      </div>
-
-      <div className="metric-value">
-        <CountUp
-          end={metric.value}
-          duration={2}
-          decimals={metric.label.includes('Rate') ? 1 : 0}
-          suffix={metric.label.includes('Rate') ? '%' : ''}
-        />
-      </div>
-
-      <div className="metric-label">{metric.label}</div>
+      <Card className="@container/card">
+        <CardHeader>
+          <CardDescription>{metric.label}</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            <CountUp
+              end={metric.value}
+              duration={2}
+              decimals={metric.label.includes('Rate') ? 1 : 0}
+              suffix={metric.label.includes('Rate') ? '%' : ''}
+            />
+          </CardTitle>
+          <CardAction>
+            <Badge variant="outline">
+              <TrendIcon className="size-4" />
+              {Math.abs(metric.change)}{metric.label.includes('Rate') ? '%' : ''}
+            </Badge>
+          </CardAction>
+        </CardHeader>
+      </Card>
     </motion.div>
   );
 };
@@ -136,133 +136,150 @@ const MetricCard = ({ metric }: { metric: MetricData }) => {
 const RiskTrendChart = () => {
   return (
     <motion.div
-      className="dashboard-card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      style={{ padding: '24px' }}
     >
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-white">Risk Trends by Model</h3>
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#06B6D4' }}></div>
-            <span className="text-gray-400">Cohere</span>
+      <Card className="@container/card">
+        <CardHeader>
+          <CardTitle>Risk Trends by Model</CardTitle>
+          <CardDescription>
+            Model vulnerability assessment over time
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          <div className="flex items-center gap-4 text-sm mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+              <span className="text-muted-foreground">Cohere</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+              <span className="text-muted-foreground">Gemini</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="text-muted-foreground">GPT-4</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+              <span className="text-muted-foreground">Claude</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#8B5CF6' }}></div>
-            <span className="text-gray-400">Gemini</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10B981' }}></div>
-            <span className="text-gray-400">GPT-4</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }}></div>
-            <span className="text-gray-400">Claude</span>
-          </div>
-        </div>
-      </div>
 
-      <div className="chart-container" style={{ height: '300px' }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={mockRiskTrendData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-            <XAxis
-              dataKey="date"
-              tick={{ fill: '#9CA3AF', fontSize: 12 }}
-              tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-            />
-            <YAxis tick={{ fill: '#9CA3AF', fontSize: 12 }} />
-            <Line
-              type="monotone"
-              dataKey="cohere"
-              stroke="#06B6D4"
-              strokeWidth={3}
-              dot={{ fill: '#06B6D4', strokeWidth: 2, r: 4 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="gemini"
-              stroke="#8B5CF6"
-              strokeWidth={3}
-              dot={{ fill: '#8B5CF6', strokeWidth: 2, r: 4 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="gpt4"
-              stroke="#10B981"
-              strokeWidth={3}
-              dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="claude"
-              stroke="#F59E0B"
-              strokeWidth={3}
-              dot={{ fill: '#F59E0B', strokeWidth: 2, r: 4 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+          <div style={{ height: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={mockRiskTrendData}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(date) => new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                />
+                <YAxis tickLine={false} axisLine={false} />
+                <Line
+                  type="monotone"
+                  dataKey="cohere"
+                  stroke="hsl(var(--chart-1))"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="gemini"
+                  stroke="hsl(var(--chart-2))"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="gpt4"
+                  stroke="hsl(var(--chart-3))"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="claude"
+                  stroke="hsl(var(--chart-4))"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };
 
 const AttackDistribution = () => {
+  const muttedAttackTypes = mockAttackTypes.map((type, index) => ({
+    ...type,
+    color: `hsl(var(--chart-${index + 1}))`
+  }));
+
   return (
     <motion.div
-      className="dashboard-card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.4 }}
-      style={{ padding: '24px' }}
     >
-      <h3 className="text-xl font-semibold text-white mb-6">Attack Type Distribution</h3>
-
-      <div className="flex items-center gap-8">
-        <div className="chart-container" style={{ width: '200px', height: '200px' }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={mockAttackTypes}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={90}
-                dataKey="value"
-              >
-                {mockAttackTypes.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-white font-mono">
-                <CountUp end={1247} duration={2} />
+      <Card className="@container/card">
+        <CardHeader>
+          <CardTitle>Attack Type Distribution</CardTitle>
+          <CardDescription>
+            Breakdown of attack patterns and techniques
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center gap-8">
+          <div className="relative" style={{ width: '200px', height: '200px' }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={muttedAttackTypes}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  dataKey="value"
+                >
+                  {muttedAttackTypes.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <div className="text-2xl font-bold font-mono">
+                  <CountUp end={1247} duration={2} />
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Total Attacks</div>
               </div>
-              <div className="text-xs text-gray-400 uppercase tracking-wide">Total Attacks</div>
             </div>
           </div>
-        </div>
 
-        <div className="flex-1 space-y-4">
-          {mockAttackTypes.map((type) => (
-            <div key={type.name} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-4 h-4 rounded-full"
-                  style={{ backgroundColor: type.color }}
-                />
-                <span className="text-sm text-gray-300">{type.name}</span>
+          <div className="flex-1 space-y-4">
+            {muttedAttackTypes.map((type) => (
+              <div key={type.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-4 h-4 rounded-full"
+                    style={{ backgroundColor: type.color }}
+                  />
+                  <span className="text-sm text-muted-foreground">{type.name}</span>
+                </div>
+                <div className="text-sm font-mono">{type.value}%</div>
               </div>
-              <div className="text-sm font-mono text-white">{type.value}%</div>
-            </div>
-          ))}
-        </div>
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 };
@@ -280,65 +297,58 @@ export default function AgentAnalytics({
   }, [params]);
 
   return (
-    <main className="min-h-screen" style={{ background: 'var(--color-primary-900)' }}>
+    <div className="flex flex-col gap-4 md:gap-6">
       {/* Header */}
-      <div className="border-b" style={{ borderColor: 'var(--color-primary-700)', backgroundColor: 'var(--color-primary-800)' }}>
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                href={`/agents/${agentId}`}
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
-              >
-                <ArrowLeftIcon className="w-5 h-5" />
-                Back to Agent
-              </Link>
-              <div className="h-6 w-px bg-gray-600" />
-              <div>
-                <h1 className="text-3xl font-bold text-white">Analytics Dashboard</h1>
-                <p className="text-gray-400 mt-1">Agent {agentId} • Real-time AI security monitoring</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsSimulating(!isSimulating)}
-                className={`action-button ${isSimulating ? 'secondary' : ''}`}
-              >
-                {isSimulating ? <PauseIcon className="w-4 h-4" /> : <PlayIcon className="w-4 h-4" />}
-                {isSimulating ? 'Pause' : 'Start'} Simulation
-              </button>
-
-              <button className="action-button secondary">
-                <ArrowDownTrayIcon className="w-4 h-4" />
-                Export Report
-              </button>
-            </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href={`/agents/${agentId}`}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <IconArrowLeft className="w-5 h-5" />
+            Back to Agent
+          </Link>
+          <div className="h-6 w-px bg-border" />
+          <div>
+            <h1 className="text-3xl font-bold">Analytics Dashboard</h1>
+            <p className="text-muted-foreground mt-1">Agent {agentId} • Real-time AI security monitoring</p>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="p-6">
-        {/* Executive Metrics */}
-        <div className="metrics-grid">
-          {mockMetrics.map((metric, index) => (
-            <MetricCard key={metric.label} metric={metric} />
-          ))}
-        </div>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={() => setIsSimulating(!isSimulating)}
+            variant={isSimulating ? "outline" : "default"}
+          >
+            {isSimulating ? <IconPlayerPause className="w-4 h-4 mr-2" /> : <IconPlay className="w-4 h-4 mr-2" />}
+            {isSimulating ? 'Pause' : 'Start'} Simulation
+          </Button>
 
-        {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <RiskTrendChart />
-          <AttackDistribution />
-        </div>
-
-        {/* Advanced Analytics */}
-        <div className="space-y-6">
-          <VulnerabilityHeatmap />
-          <RealTimeMonitor />
+          <Button variant="outline">
+            <IconDownload className="w-4 h-4 mr-2" />
+            Export Report
+          </Button>
         </div>
       </div>
-    </main>
+
+      {/* Executive Metrics */}
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+        {mockMetrics.map((metric, index) => (
+          <MetricCard key={metric.label} metric={metric} />
+        ))}
+      </div>
+
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <RiskTrendChart />
+        <AttackDistribution />
+      </div>
+
+      {/* Advanced Analytics */}
+      <div className="space-y-6">
+        <VulnerabilityHeatmap />
+        <RealTimeMonitor />
+      </div>
+    </div>
   );
 }
