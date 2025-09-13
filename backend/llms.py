@@ -55,4 +55,4 @@ def cerebras_stream_chat(prompt: str):
 
 
 if __name__ == "__main__":
-    cerebras_stream_chat("Hey how are you doing?")
+    cohere_stream_chat("Hey how are you doing?")
