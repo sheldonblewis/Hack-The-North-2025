@@ -35,23 +35,28 @@ def cohere_embeddings():
     return
 
 
-def cerebras_stream_chat(prompt: str):
+def cerebras_stream_chat(prompt: str, system_prompt: str = None):
+    messages_list = []
+    if system_prompt:
+        messages_list.append({"role": "system", "content": system_prompt})
+    messages_list.append({"role": "user", "content": prompt})
+
+
     stream = cereb.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
+        messages=messages_list,
         model="llama-4-scout-17b-16e-instruct",
         stream=True,
         max_completion_tokens=20000,
         temperature=1,
         top_p=0.8
     )
-
+    
+    complete_chat = ""
     for chunk in stream:
         print(chunk.choices[0].delta.content or "", end="", flush=True)
+        complete_chat += (chunk.choices[0].delta.content or "")
+    
+    return complete_chat
 
 
 if __name__ == "__main__":
