@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { usePathname } from "next/navigation"
 
 interface Agent {
   id: string
@@ -23,6 +24,17 @@ const defaultAgents: Agent[] = [
 
 export function AgentProvider({ children }: { children: React.ReactNode }) {
   const [selectedAgent, setSelectedAgent] = React.useState<Agent | null>(null)
+  const pathname = usePathname()
+  React.useEffect(() => {
+    const agentMatch = pathname.match(/^\/agents\/([^\/]+)/)
+    if (agentMatch) {
+      const agentId = agentMatch[1]
+      const agent = defaultAgents.find(a => a.id === agentId)
+      if (agent && selectedAgent?.id !== agentId) {
+        setSelectedAgent(agent)
+      }
+    }
+  }, [pathname, selectedAgent])
 
   const value = React.useMemo(() => ({
     selectedAgent,
