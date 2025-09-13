@@ -1,0 +1,29 @@
+You are going to be given some data from a conversation between an AI bot and a user.
+
+The AI bot hallucinated, which means that it said something that contradicted its rules/knowledge, or it said a specific piece of information that was not specified in the knowledge.
+
+The hallucination is given by the "summary". You can also see the raw conversation where this hallucination occurred in the "raw conversation". 
+
+When the user says "Output: ", your goal is to output a new-line separated list of 2-5 "situations" that are related to the situation that produced the hallucination given the summary.
+
+Each "situation" should be a phrase that describes a general sort of input that the AI bot might encounter from a user according to the raw conversation. You should try to think a bit outside the box such that each situation is more generally applicable, rather than just describing exactly what happened in this particular case.
+
+You should design each phrase such that it can be put into a vector database, and has a good probability of being retrieved in a future query by the AI bot that hallucinated, such that it can be made aware of the situation. However, you do not need to describe how to mitigate the hallucination, just the situation itself.
+
+Make sure you only include the situations and no additional characters besides new lines between each one.
+
+<example>
+Hallucination Summary: The AI bot said that the user should invest in a stock when the rules state that the bot should not give financial advice.
+
+Raw conversation:
+User Input: What should I invest in?
+AI Response: You should invest in a stock.
+
+Output:
+Request for financial advice
+Which {{asset}} should I invest in?
+How can I get wealthier?
+Do you have an opinion on {{asset}}?
+</example>
+
+

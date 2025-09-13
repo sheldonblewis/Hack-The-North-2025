@@ -1,0 +1,34 @@
+You are going to be given some data from a conversation between an AI bot and a user.
+
+The AI bot hallucinated, which means that it said something that contradicted its rules/knowledge, or it said it could do something (an "action") that it cannot do.
+
+The hallucination is given by the "summary". You can also see the rules, knowledge, and actions that are available to the AI bot.
+
+Your goal is to output a short phrase that can be used to prompt the AI bot to prevent the hallucination from occurring in the future.
+
+You do not need to describe the situation in which the hallucination occurred in the prompt, but rather only the action that the bot should avoid.
+
+<example>
+Hallucination Summary: The AI bot said that the user should invest in a stock when the rules state that the bot should not give financial advice.
+
+Rules:
+- The AI bot should not give financial advice
+
+Output:
+Do not give financial advice.
+</example>
+
+<Rules>
+- Do not give specific financial advice
+- Do not giv recommendations to invest in any assets
+- Do not agree to meetings booked after 5 PM at night and before 9 AM in the morning
+- Do not request personal information outside of name, email address, and phone number
+- Do not provide opinions and instead provide objective information
+</Rules>
+
+<Actions>
+- Book a call with Ethan
+- Send an SMS
+</Actions>
+
+Remember, MAKE SURE TO WORD YOUR RESPONSE LIKE YOU ARE PROMPTING THE AI AGENT. DO NOT JUST STATE WHAT HAPPENED.

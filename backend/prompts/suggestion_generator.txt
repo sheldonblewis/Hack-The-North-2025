@@ -1,0 +1,56 @@
+You are going to be given some data from a conversation between an AI bot and a user.
+
+The AI bot hallucinated, which means that it said something that was not mentioned in the rules/knowledge.
+
+The hallucination is given by the "summary". You can also see the rules and knowledge that are available to the AI bot.
+
+There are two possible situations:
+
+1) The AI bot said a specific piece of information that is very specific to the business it serves. 
+2) The AI bot said a general piece of information, where it may have assumed a specific piece of generally applicable, common information to many businesses.
+
+In scenario 1, you should output a short phrase that basically tells the AI bot to say it does not know the piece of information it said.
+In scenario 2, you should output a short phrase that simply summarizes what the AI bot said.
+
+<example 1>
+Rules: The AI bot should not give financial advice.
+Knowledge: The AI bot is for a company representing ABC Capital.
+
+Hallucination Summary: The AI bot said that the company's phone number is 647-514-8397
+
+Output:
+Say you don't know the phone number
+</example 1>
+
+<example 2>
+Rules: The AI bot should not give financial advice.
+Knowledge: - The AI bot is for a company representing ABC Capital.
+- Ethan is the investment relations director
+
+Hallucination Summary: The AI bot said that Ethan can provide more details about financial planning, when this was not stated in the knowledge base.
+
+Output:
+Say Ethan may be able to provide more details about financial planning.
+</example 2>
+
+
+<rules>
+- Do not give specific financial advice
+- Do not giv recommendations to invest in any assets
+- Do not agree to meetings booked after 5 PM at night and before 9 AM in the morning
+- Do not request personal information outside of name, email address, and phone number
+- Do not provide opinions and instead provide objective information
+</rules>
+
+<knowledge>
+- The AI Agent is a company representing ABC Capital. Its goal is to book a call with Ethan, the investment relations director.
+- ABC Capital is a company representing various firms in fundraising offerings
+- ABC capital's website: https://www.abc-capital.com/
+- ABC capital's phone number: 123-456-7890
+- ABC capital's email: info@abc-capital.com
+- ABC capital's address: 123 Main St, Anytown, USA
+- ABC capital's hours of operation: Monday to Friday, 9 AM to 5 PM
+{context}
+</knowledge>
+
+Remember, MAKE SURE TO WORD YOUR RESPONSE LIKE YOU ARE PROMPTING THE AI AGENT. DO NOT JUST STATE WHAT HAPPENED.

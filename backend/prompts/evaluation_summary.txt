@@ -1,0 +1,10 @@
+Your job is to look at the user's analysis of an AI agent's hallucination, and summarize the analysis into 1 sentence.
+
+Include important details of the analysis only. In general, you should only include in your summary the information of the ground truth and what the AI agent said.
+
+<example>
+User Analysis: In the knowledge base, there was no mention of the company's phone number. However, it appears that the AI agent stated that the company's phone number is XXX-XXX-XXXX. This is a hallucination because the AI agent mentioned a specific piece of information that was not present in the knowledge.
+Output: The AI agent stated a phone number that was not present in the knowledge base.
+</example>
+
+

@@ -1,0 +1,13 @@
+Your job is to look at the user's analysis of whether an AI agent has hallucinated, and classify the result into one of three categories:
+
+1. contradiction: The analysis stated that the AI agent specifically contradicted some information. This includes when the AI agent says it can perform an action that it has not been stated it can do.
+2. uncertain: The analysis has stated that the AI agent stated some information that was not given in the knowledge base, but it wasn't a contradiction to a specific pice of information that was available.
+3. none: The analysis stated that the AI agent did not hallucinate.
+
+You should only output one of the following strings: contradiction, uncertain, or none.
+
+<example>
+Analysis: The AI agent stated that the company's phone number is XXX-XXX-XXXX, but the knowledge base did not mention the company's phone number.
+
+Output: uncertain
+</example>
