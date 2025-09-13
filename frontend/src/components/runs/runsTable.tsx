@@ -231,7 +231,7 @@ export function RunsTable({ data }: RunsTableProps = {}) {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="text-muted-foreground flex-1 text-sm">
-          Showing {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} entries
+          Showing {table.getFilteredRowModel().rows.length} of {table.getFilteredRowModel().rows.length} entries
         </div>
         <div className="space-x-2">
           <Button

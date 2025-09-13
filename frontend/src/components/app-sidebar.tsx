@@ -43,14 +43,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const handleAgentChange = (agent: typeof selectedAgent) => {
     setSelectedAgent(agent)
-    const segments = pathname.split('/').filter(Boolean)
-    const agentIndex = segments.findIndex(segment => segment === 'agents')
-    if (agentIndex !== -1 && segments[agentIndex + 1]) {
-      segments[agentIndex + 1] = agent.id
-      const newPath = '/' + segments.join('/')
-      router.push(newPath)
-    } else {
-      router.push(`/agents/${agent.id}`)
+    if (agent) {
+      router.push(`/agents/${agent.id}/runs`)
     }
   }
 
@@ -62,7 +56,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     navMain: selectedAgent ? [
       {
-        title: "Dashboard",
+        title: "Runs",
+        url: `/agents/${selectedAgent.id}/runs`,
+        icon: IconRobot,
+      },
+      {
+        title: "Metrics Dashboard",
         url: `/agents/${selectedAgent.id}`,
         icon: IconHome,
       },
@@ -70,11 +69,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Chat",
         url: `/agents/${selectedAgent.id}/chat`,
         icon: IconMessageCircle,
-      },
-      {
-        title: "Runs",
-        url: `/agents/${selectedAgent.id}/runs`,
-        icon: IconRobot,
       },
       {
         title: "Analytics",

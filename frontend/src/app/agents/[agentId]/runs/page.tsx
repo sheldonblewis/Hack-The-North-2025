@@ -2,7 +2,7 @@ import Link from "next/link";
 import { RunsTable } from "~/components/runs/runsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, OctagonX, TriangleAlert, Info } from "lucide-react";
 
 export default function AgentRuns({
   params,
@@ -47,7 +47,6 @@ export default function AgentRuns({
 
         {/* Recommended Tests Card */}
         <Card className="flex flex-col">
-
           <CardContent className="space-y-4 py-0 pt-0 min-w-2xl">
             <div>
               <CardTitle className="text-lg">Recommended Tests</CardTitle>
@@ -57,27 +56,33 @@ export default function AgentRuns({
             </div>
             
             <div className="grid grid-cols-3 gap-2">
-              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start bg-yellow-50 border-yellow-200">
+              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative">
+                <OctagonX className="absolute -top-1 -right-1 h-4 w-4 text-red-500 drop-shadow-lg animate-pulse" title="High Urgency" />
                 <span className="font-medium text-xs leading-tight">Jailbreak</span>
                 <span className="text-xs text-muted-foreground leading-tight">Bypass AI safeguards</span>
               </Button>
-              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start leading-tight">
+              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
+                <TriangleAlert className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 drop-shadow-lg" title="Medium Urgency" />
                 <span className="font-medium text-xs ">Base64</span>
                 <span className="text-xs text-muted-foreground">Binary data encoding</span>
               </Button>
-              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start leading-tight">
+              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
+                <Info className="absolute -top-1 -right-1 h-4 w-4 text-green-500 drop-shadow-lg" title="Low Urgency" />
                 <span className="font-medium text-xs">Caesar</span>
                 <span className="text-xs text-muted-foreground">Character shift cipher</span>
               </Button>
-              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start leading-tight">
+              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
+                <OctagonX className="absolute -top-1 -right-1 h-4 w-4 text-red-500 drop-shadow-lg animate-pulse" title="High Urgency" />
                 <span className="font-medium text-xs">UnicodeConfusable</span>
                 <span className="text-xs text-muted-foreground">Similar-looking characters</span>
               </Button>
-              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start leading-tight">
+              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
+                <TriangleAlert className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 drop-shadow-lg" title="Medium Urgency" />
                 <span className="font-medium text-xs">ROT13</span>
                 <span className="text-xs text-muted-foreground">13-position substitution</span>
               </Button>
-              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start bg-blue-50 border-blue-200 leading-tight">
+              <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
+                <Info className="absolute -top-1 -right-1 h-4 w-4 text-green-500 drop-shadow-lg" title="Low Urgency" />
                 <span className="font-medium text-xs">Comprehensive</span>
                 <span className="text-xs text-muted-foreground">Run all security tests</span>
               </Button>
