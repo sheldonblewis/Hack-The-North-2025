@@ -72,8 +72,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconMessageCircle,
       },
       {
-<<<<<<< HEAD
-=======
         title: "Runs",
         url: `/agents/${selectedAgent.id}/runs`,
         icon: IconRobot,
@@ -84,7 +82,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconShield,
       },
       {
->>>>>>> 1a592b5 (worked on the test-api page)
         title: "Analytics",
         url: `/agents/${selectedAgent.id}/analytics`,
         icon: IconChartAreaLine,
