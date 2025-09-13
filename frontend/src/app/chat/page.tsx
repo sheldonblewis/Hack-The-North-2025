@@ -113,7 +113,7 @@ const FlagDetails = ({ flag, onClose }: FlagDetailsProps) => {
             <p className="text-gray-600 text-sm">
               {flag.flag_type === "contradiction"
                 ? "Your AI directly went against its configuration"
-                : "Your AI said something that was not accounted for in its configuration"}
+                : "Your AI said something that was not Agented for in its configuration"}
             </p>
           </div>
 
