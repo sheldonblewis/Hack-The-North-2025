@@ -38,7 +38,7 @@ class JailBreakAgent:
         counter = 0
 
         for schema in reversed(self.attack_prompts_list):
-            if counter > 3:
+            if counter > 2:
                 break
 
             prompt = schema["prompt"]
