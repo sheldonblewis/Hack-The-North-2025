@@ -20,7 +20,7 @@ export function LoginForm({
             }}
           >
             <Button type="submit" className="w-full bg-white/90 cursor-pointer">
-              Sign in with Auth0
+              Sign in
             </Button>
           </form>
           <div className="text-center text-xs">
