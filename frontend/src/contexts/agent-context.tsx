@@ -8,8 +8,8 @@ interface Agent {
 }
 
 interface AgentContextType {
-  selectedAgent: Agent
-  setSelectedAgent: (agent: Agent) => void
+  selectedAgent: Agent | null
+  setSelectedAgent: (agent: Agent | null) => void
   agents: Agent[]
 }
 
@@ -22,7 +22,7 @@ const defaultAgents: Agent[] = [
 ]
 
 export function AgentProvider({ children }: { children: React.ReactNode }) {
-  const [selectedAgent, setSelectedAgent] = React.useState<Agent>(defaultAgents[0]!)
+  const [selectedAgent, setSelectedAgent] = React.useState<Agent | null>(null)
 
   const value = React.useMemo(() => ({
     selectedAgent,

@@ -60,7 +60,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       email: "tester@example.com",
       avatar: "/avatars/agent-tester.jpg",
     },
-    navMain: [
+    navMain: selectedAgent ? [
       {
         title: "Dashboard",
         url: `/agents/${selectedAgent.id}`,
@@ -86,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: `/agents/${selectedAgent.id}/alerts`,
         icon: IconAlertTriangle,
       },
-    ],
+    ] : [],
     navSecondary: [
       {
         title: "Settings",
@@ -123,11 +123,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/agents">
+                    <IconHome className="size-4" />
+                    <span>Home</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild className="border tabular-nums">
                     <SidebarMenuButton className="w-full justify-between">
                       <div className="flex items-center gap-2">
-                        <span>{selectedAgent.name}</span>
+                        <span>{selectedAgent ? selectedAgent.name : "Select Agent"}</span>
                       </div>
                       <IconChevronDown className="size-4" />
                     </SidebarMenuButton>

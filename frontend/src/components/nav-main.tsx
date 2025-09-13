@@ -23,6 +23,12 @@ export function NavMain({
 }) {
   const { selectedAgent } = useAgent()
   const pathname = usePathname()
+  
+  // Don't render anything if no agent is selected
+  if (!selectedAgent) {
+    return null
+  }
+  
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
