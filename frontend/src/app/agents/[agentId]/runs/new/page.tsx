@@ -54,6 +54,7 @@ export default function NewRun({
   const [successThreshold, setSuccessThreshold] = useState([5]);
   const [enableLogging, setEnableLogging] = useState(true);
   const [generateReport, setGenerateReport] = useState(true);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const { agentId } = use(params);
 
@@ -71,6 +72,20 @@ export default function NewRun({
         ? prev.filter(id => id !== attackId)
         : [...prev, attackId]
     );
+  };
+
+  const handleCancel = () => {
+    const hasFormData = testName || description || targetEndpoint || selectedRisks.length > 0 || selectedAttacks.length > 0 || customPrompts;
+    
+    if (hasFormData) {
+      setShowCancelDialog(true);
+    } else {
+      window.location.href = `/agents/${agentId}/runs`;
+    }
+  };
+
+  const confirmCancel = () => {
+    window.location.href = `/agents/${agentId}/runs`;
   };
 
   const createTestRun = api.testRun.create.useMutation({
@@ -377,13 +392,43 @@ export default function NewRun({
 
           {/* Submit Button */}
           <div className="flex justify-end space-x-4 pt-6 border-t">
-            <Link href={`/agents/${agentId}/runs`}>
-              <Button variant="outline">Cancel</Button>
-            </Link>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={handleCancel}
+            >
+              Cancel
+            </Button>
             <Button type="submit" disabled={!testName || !targetEndpoint || selectedRisks.length === 0}>
               Create Test Run
             </Button>
           </div>
+
+          {/* Cancel Confirmation Dialog */}
+          {showCancelDialog && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+                <h3 className="text-lg font-semibold mb-2">Discard Changes?</h3>
+                <p className="text-gray-600 mb-4">
+                  You have unsaved changes. Are you sure you want to cancel and lose your progress?
+                </p>
+                <div className="flex justify-end space-x-3">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowCancelDialog(false)}
+                  >
+                    Keep Editing
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    onClick={confirmCancel}
+                  >
+                    Discard Changes
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </main>
