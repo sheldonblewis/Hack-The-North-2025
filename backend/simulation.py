@@ -1,3 +1,4 @@
+from shlex import join
 from agents import DefenseAgent, JailBreakAgent
 
 
@@ -23,6 +24,24 @@ def simulate_attack(defense: DefenseAgent, attack: JailBreakAgent, previous_prom
     else:
         return False
 
+def seed_simulate_attack(defense: DefenseAgent, attack: JailBreakAgent, attack_prompt):
+    schema = {}
+    schema["prompt"] = attack_prompt
+    schema["defense_message"] = defense.ask(schema["prompt"])
+
+    # Add to history
+    attack.attack_prompts_list.append(schema)
+
+    # See if attack worked
+    status = attack.evaluate_broken(schema["defense_message"])
+
+    # Return True if attack succesful
+    if status:
+        for j in range(10):
+            print("SUCCESS - JAILBROKEN!!!!!!")
+        return True
+    else:
+        return False    
 
 
 def start_simulation(iterations, attack_objective, initial_attack_prompt, 
@@ -31,6 +50,14 @@ def start_simulation(iterations, attack_objective, initial_attack_prompt,
     defense_agent = DefenseAgent(system_prompt=defense_system_prompt)
     attack_agent = JailBreakAgent(objective=attack_objective)
 
+    # First try seed prompts to see if it works:
+    attack_agent.create_seeds()
+
+    for prompt in attack_agent.seed_attack_prompts:
+        if seed_simulate_attack(defense_agent, attack_agent, prompt):
+            return True
+
+    # Try iteratvie appraoch for jailbreaking
 
     # Try attack with initial attack prompt
     defense_message = defense_agent.ask(initial_attack_prompt)
