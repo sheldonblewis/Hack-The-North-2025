@@ -31,7 +31,7 @@ def start_simulation_with_db(iterations: int, attack_objective: str,
         model_provider="cerebras",
         model_name="llama-4-scout-17b-16e-instruct"
     )
-
+    
     # Start simulation run tracking
     run_id = db_integration.start_simulation_run(
         agent_id=agent_id,
