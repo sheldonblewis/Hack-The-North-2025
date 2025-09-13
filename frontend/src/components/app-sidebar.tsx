@@ -9,6 +9,8 @@ import {
   IconSettings,
   IconHome,
   IconChevronDown,
+  IconChartAreaLine,
+  IconMessageCircle,
 } from "@tabler/icons-react"
 
 import { useAgent } from "~/contexts/agent-context"
@@ -65,9 +67,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconHome,
       },
       {
+        title: "Chat",
+        url: `/agents/${selectedAgent.id}/chat`,
+        icon: IconMessageCircle,
+      },
+      {
         title: "Runs",
         url: `/agents/${selectedAgent.id}/runs`,
         icon: IconRobot,
+      },
+      {
+        title: "Analytics",
+        url: `/agents/${selectedAgent.id}/analytics`,
+        icon: IconChartAreaLine,
       },
       {
         title: "Alerts",
