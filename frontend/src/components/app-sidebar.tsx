@@ -11,6 +11,7 @@ import {
   IconChevronDown,
   IconChartAreaLine,
   IconMessageCircle,
+  IconShield,
 } from "@tabler/icons-react"
 
 import { useAgent } from "~/contexts/agent-context"
@@ -71,6 +72,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconMessageCircle,
       },
       {
+<<<<<<< HEAD
+=======
+        title: "Runs",
+        url: `/agents/${selectedAgent.id}/runs`,
+        icon: IconRobot,
+      },
+      {
+        title: "Red Team Testing",
+        url: "/test-api",
+        icon: IconShield,
+      },
+      {
+>>>>>>> 1a592b5 (worked on the test-api page)
         title: "Analytics",
         url: `/agents/${selectedAgent.id}/analytics`,
         icon: IconChartAreaLine,

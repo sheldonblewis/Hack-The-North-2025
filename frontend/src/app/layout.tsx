@@ -24,7 +24,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable} dark`}>
-      <body>
+      <body suppressHydrationWarning={true}>
         <AuthSessionProvider>
           <NavigationProvider>
             <MainLayout>

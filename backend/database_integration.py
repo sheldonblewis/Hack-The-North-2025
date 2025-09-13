@@ -10,7 +10,13 @@ logger = logging.getLogger(__name__)
 
 class DatabaseIntegration:
     def __init__(self):
-        self.db = get_db()
+        self._db = None
+
+    def get_db(self):
+        """Thread-safe database getter"""
+        if self._db is None:
+            self._db = get_db()
+        return self._db
 
     def save_agent(self, name: str, objective: str, model_provider: str = "cerebras",
                    model_name: str = "llama-4-scout-17b-16e-instruct") -> str:
@@ -23,7 +29,7 @@ class DatabaseIntegration:
             created_at=datetime.utcnow()
         )
 
-        collection = self.db.get_collection(COLLECTIONS["AGENTS"])
+        collection = self.get_db().get_collection(COLLECTIONS["AGENTS"])
         result = collection.insert_one(agent_data.to_dict())
 
         logger.info(f"Agent saved with ID: {result.inserted_id}")
@@ -54,7 +60,7 @@ class DatabaseIntegration:
             timestamp=datetime.utcnow()
         )
 
-        collection = self.db.get_collection(COLLECTIONS["ATTACK_RESULTS"])
+        collection = self.get_db().get_collection(COLLECTIONS["ATTACK_RESULTS"])
         result = collection.insert_one(attempt_data.to_dict())
 
         logger.info(f"Attack attempt saved with ID: {result.inserted_id}")
@@ -74,7 +80,7 @@ class DatabaseIntegration:
             start_time=datetime.utcnow()
         )
 
-        collection = self.db.get_collection(COLLECTIONS["TEST_RUNS"])
+        collection = self.get_db().get_collection(COLLECTIONS["TEST_RUNS"])
         result = collection.insert_one(run_data.to_dict())
 
         logger.info(f"Simulation run started with ID: {result.inserted_id}")
@@ -83,7 +89,7 @@ class DatabaseIntegration:
     def update_simulation_run(self, run_id: str, total_attempts: int,
                             successful_attempts: int, status: str = "completed"):
         """Update simulation run statistics"""
-        collection = self.db.get_collection(COLLECTIONS["TEST_RUNS"])
+        collection = self.get_db().get_collection(COLLECTIONS["TEST_RUNS"])
 
         update_data = {
             "total_attempts": total_attempts,
@@ -101,7 +107,7 @@ class DatabaseIntegration:
 
     def get_agent_results(self, agent_id: str, limit: int = 50):
         """Get attack results for a specific agent"""
-        collection = self.db.get_collection(COLLECTIONS["ATTACK_RESULTS"])
+        collection = self.get_db().get_collection(COLLECTIONS["ATTACK_RESULTS"])
 
         results = list(collection.find({"agent_id": agent_id})
                       .sort("timestamp", -1)
@@ -115,7 +121,7 @@ class DatabaseIntegration:
 
     def get_analytics_summary(self, agent_id: str = None):
         """Get analytics summary for dashboard"""
-        collection = self.db.get_collection(COLLECTIONS["ATTACK_RESULTS"])
+        collection = self.get_db().get_collection(COLLECTIONS["ATTACK_RESULTS"])
 
         # Build match stage
         match_stage = {} if not agent_id else {"agent_id": agent_id}

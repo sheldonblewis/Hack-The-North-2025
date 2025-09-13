@@ -5,6 +5,7 @@ import { apiClient, Agent, Analytics, AttackResult, SimulationResponse } from '~
 import { Textarea } from "~/components/ui/textarea";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Button } from "~/components/ui/button";
 import { AlertCircle, Play, Zap, Shield, Activity, Database } from "lucide-react";
 
 export default function RedTeamDashboard() {
@@ -23,29 +24,46 @@ export default function RedTeamDashboard() {
 
   useEffect(() => {
     loadData();
-    // Auto-refresh every 10 seconds
-    const interval = setInterval(loadData, 10000);
+    // Auto-refresh every 30 seconds (reduced frequency) and only when not running simulation
+    const interval = setInterval(() => {
+      if (!isRunning) {
+        loadData();
+      }
+    }, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isRunning]);
 
   const loadData = async () => {
     try {
       setError(null);
 
-      const [agentsData, analyticsData] = await Promise.all([
-        apiClient.getAgents(),
-        apiClient.getAnalytics()
-      ]);
+      // Smart loading: only fetch agents if we don't have them or if forced refresh
+      let agentsData = agents;
+      let analyticsData = analytics;
 
-      setAgents(agentsData);
-      setAnalytics(analyticsData);
+      if (agents.length === 0 || !analytics) {
+        // Full refresh on initial load
+        const [newAgents, newAnalytics] = await Promise.all([
+          apiClient.getAgents(),
+          apiClient.getAnalytics()
+        ]);
+        agentsData = newAgents;
+        analyticsData = newAnalytics;
+        setAgents(agentsData);
+        setAnalytics(analyticsData);
+      } else {
+        // Only refresh analytics and results on subsequent polls
+        analyticsData = await apiClient.getAnalytics();
+        setAnalytics(analyticsData);
+      }
 
-      if (agentsData.length > 0 && !selectedAgent) {
+      // Only fetch results if we have a selected agent
+      if (selectedAgent) {
+        const resultsData = await apiClient.getAgentResults(selectedAgent._id, 20);
+        setResults(resultsData);
+      } else if (agentsData.length > 0) {
         setSelectedAgent(agentsData[0]!);
         const resultsData = await apiClient.getAgentResults(agentsData[0]!._id, 20);
-        setResults(resultsData);
-      } else if (selectedAgent) {
-        const resultsData = await apiClient.getAgentResults(selectedAgent._id, 20);
         setResults(resultsData);
       }
 

@@ -3,6 +3,8 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from datetime import datetime
 import logging
+import certifi
+import ssl
 
 # Load environment variables
 load_dotenv()
@@ -17,24 +19,58 @@ class Database:
         self.db_name = os.getenv("MONGODB_DB_NAME", "ai-redteam")
         self.client = None
         self.db = None
+        self._connection_lock = None  # Will be initialized in connect()
 
         if not self.connection_uri:
             raise ValueError("MONGODB_URI environment variable is required")
 
     def connect(self):
-        """Connect to MongoDB Atlas"""
-        try:
-            self.client = MongoClient(self.connection_uri)
-            self.db = self.client[self.db_name]
+        """Connect to MongoDB Atlas with thread-safe connection and reduced timeouts"""
+        import threading
 
-            # Test the connection using the official method
-            self.client.admin.command('ping')
-            logger.info(f"Successfully connected to MongoDB: {self.db_name}")
+        # Initialize lock on first use
+        if self._connection_lock is None:
+            self._connection_lock = threading.Lock()
 
-            return True
-        except Exception as e:
-            logger.error(f"Failed to connect to MongoDB: {e}")
-            return False
+        # Thread-safe connection check
+        with self._connection_lock:
+            # Return existing connection if already established
+            if self.client is not None and self.db is not None:
+                try:
+                    # Quick health check
+                    self.client.admin.command('ping')
+                    return True
+                except:
+                    # Connection is stale, reconnect
+                    self.client = None
+                    self.db = None
+
+            try:
+                # Simplified, faster connection strategy
+                connection_config = {
+                    "tlsCAFile": certifi.where(),
+                    "serverSelectionTimeoutMS": 5000,  # Reduced from 30s to 5s
+                    "connectTimeoutMS": 10000,         # Reduced from 30s to 10s
+                    "socketTimeoutMS": 10000,          # Reduced timeout
+                    "maxPoolSize": 10,                 # Connection pooling
+                    "minPoolSize": 1,
+                    "maxIdleTimeMS": 60000,           # 1 minute idle timeout
+                }
+
+                logger.info("Attempting MongoDB connection...")
+                self.client = MongoClient(self.connection_uri, **connection_config)
+                self.db = self.client[self.db_name]
+
+                # Test the connection
+                self.client.admin.command('ping')
+                logger.info(f"Successfully connected to MongoDB: {self.db_name}")
+                return True
+
+            except Exception as e:
+                logger.error(f"MongoDB connection failed: {str(e)[:100]}...")
+                self.client = None
+                self.db = None
+                return False
 
     def disconnect(self):
         """Close MongoDB connection"""
