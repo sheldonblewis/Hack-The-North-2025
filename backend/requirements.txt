@@ -1,0 +1,19 @@
+# Web Framework
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+
+# LLM APIs and SDKs
+cohere==5.17.0
+cerebras-cloud-sdk==1.17.1
+
+# Environment and Config
+python-dotenv==1.0.1
+
+# Web Framework (Flask for visualization)
+flask==3.1.0
+
+# Data Classes and Type Extensions
+typing-extensions==4.12.2
+
+# Development and Testing
+pytest==8.3.4
