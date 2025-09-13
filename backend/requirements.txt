@@ -9,6 +9,9 @@ cerebras-cloud-sdk==1.17.1
 # Environment and Config
 python-dotenv==1.0.1
 
+# Database
+pymongo==4.6.1
+
 # Web Framework (Flask for visualization)
 flask==3.1.0
 
