@@ -1,25 +1,17 @@
 "use client"
 
 import * as React from "react"
+import { useRouter, usePathname } from "next/navigation"
 import {
   IconRobot,
-  IconChartBar,
-  IconDashboard,
   IconAlertTriangle,
-  IconMessageCircle,
-  IconFileDescription,
-  IconPlayArrow,
-  IconFolder,
   IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
   IconSettings,
   IconHome,
   IconChevronDown,
 } from "@tabler/icons-react"
 
+import { useAgent } from "~/contexts/agent-context"
 import { NavDocuments } from "~/components/nav-documents"
 import { NavMain } from "~/components/nav-main"
 import { NavSecondary } from "~/components/nav-secondary"
@@ -42,45 +34,60 @@ import {
   SidebarGroupContent,
 } from "~/components/ui/sidebar"
 
-const data = {
-  user: {
-    name: "Agent Tester",
-    email: "tester@example.com",
-    avatar: "/avatars/agent-tester.jpg",
-  },
-  agents: [
-    { id: "1", name: "Security Agent" },
-    { id: "2", name: "Performance Agent" },
-    { id: "3", name: "Compliance Agent" },
-  ],
-  navMain: [
-    {
-      title: "Home",
-      url: "/",
-      icon: IconHome,
-    },
-    {
-      title: "Agents",
-      url: "/agents",
-      icon: IconRobot,
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Help",
-      url: "#",
-      icon: IconHelp,
-    },
-  ],
-}
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [selectedAgent, setSelectedAgent] = React.useState(data.agents[0]!)
+  const { selectedAgent, setSelectedAgent, agents } = useAgent()
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const handleAgentChange = (agent: typeof selectedAgent) => {
+    setSelectedAgent(agent)
+    const segments = pathname.split('/').filter(Boolean)
+    const agentIndex = segments.findIndex(segment => segment === 'agents')
+    if (agentIndex !== -1 && segments[agentIndex + 1]) {
+      segments[agentIndex + 1] = agent.id
+      const newPath = '/' + segments.join('/')
+      router.push(newPath)
+    } else {
+      router.push(`/agents/${agent.id}`)
+    }
+  }
+
+  const data = {
+    user: {
+      name: "Agent Tester",
+      email: "tester@example.com",
+      avatar: "/avatars/agent-tester.jpg",
+    },
+    navMain: [
+      {
+        title: "Dashboard",
+        url: `/agents/${selectedAgent.id}`,
+        icon: IconHome,
+      },
+      {
+        title: "Runs",
+        url: `/agents/${selectedAgent.id}/runs`,
+        icon: IconRobot,
+      },
+      {
+        title: "Alerts",
+        url: `/agents/${selectedAgent.id}/alerts`,
+        icon: IconAlertTriangle,
+      },
+    ],
+    navSecondary: [
+      {
+        title: "Settings",
+        url: "#",
+        icon: IconSettings,
+      },
+      {
+        title: "Help",
+        url: "#",
+        icon: IconHelp,
+      },
+    ],
+  }
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -105,7 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild className="border">
+                  <DropdownMenuTrigger asChild className="border tabular-nums">
                     <SidebarMenuButton className="w-full justify-between">
                       <div className="flex items-center gap-2">
                         <span>{selectedAgent.name}</span>
@@ -113,11 +120,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       <IconChevronDown className="size-4" />
                     </SidebarMenuButton>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-64">
-                    {data.agents.map((agent) => (
+                  <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-64 tabular-nums">
+                    {agents.map((agent) => (
                       <DropdownMenuItem
                         key={agent.id}
-                        onClick={() => setSelectedAgent(agent)}
+                        onClick={() => handleAgentChange(agent)}
                         className="flex items-center justify-between"
                       >
                         <span>{agent.name}</span>

@@ -1,7 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { IconCirclePlusFilled, type Icon } from "@tabler/icons-react"
+import { useAgent } from "~/contexts/agent-context"
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -19,6 +21,8 @@ export function NavMain({
     icon?: Icon
   }[]
 }) {
+  const { selectedAgent } = useAgent()
+  const pathname = usePathname()
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -29,7 +33,7 @@ export function NavMain({
               className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
               asChild
             >
-              <Link href="/agents/1/runs/new">
+              <Link href={`/agents/${selectedAgent.id}/runs/new`}>
                 <IconCirclePlusFilled />
                 <span>New Run</span>
               </Link>
@@ -37,16 +41,25 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title} asChild>
-                <Link href={item.url}>
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {items.map((item) => {
+            const isActive = pathname === item.url || 
+              (item.url !== `/agents/${selectedAgent.id}` && pathname.startsWith(item.url))
+            
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton 
+                  tooltip={item.title} 
+                  asChild 
+                  isActive={isActive}
+                >
+                  <Link href={item.url}>
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
