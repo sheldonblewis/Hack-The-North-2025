@@ -4,7 +4,7 @@ uvicorn[standard]==0.32.1
 
 # LLM APIs and SDKs
 cohere==5.17.0
-cerebras-cloud-sdk==1.17.1
+cerebras-cloud-sdk==1.50.1
 
 # Environment and Config
 python-dotenv==1.0.1

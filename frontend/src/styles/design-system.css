@@ -168,7 +168,7 @@ body {
 
 .metric-label {
   font-size: var(--text-sm);
-  color: var(--color-primary-600);
+  color: var(--color-primary-100);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 500;

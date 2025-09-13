@@ -77,12 +77,12 @@ def start_simulation(iterations, attack_objective, initial_attack_prompt,
 
     # Iterate
     for i in range(iterations):
-        simulate_attack(defense_agent, attack_agent, attack_prompt, defense_message)
+        success = simulate_attack(defense_agent, attack_agent, attack_prompt, defense_message)
 
         attack_prompt = attack_agent.attack_prompts_list[-1]["prompt"]
         defense_message = attack_agent.attack_prompts_list[-1]["defense_message"]
 
-        if state == True:
+        if success == True:
             for j in range(10):
                 print("SUCCESS - JAILBROKEN in ", i, " tries!!!!!!")
             return True
