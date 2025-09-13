@@ -15,7 +15,7 @@ cereb = Cerebras(api_key=CEREBRAS_API_KEY)
 
 def cohere_stream_chat(prompt: str):
     response = co.chat_stream(
-        model="command-a-03-2025",
+        model="command-r7b-12-2024",
             messages=[{"role": "user", "content": prompt}],
     )
 
