@@ -1,6 +1,8 @@
-import { signIn, auth } from "~/server/auth";
+import { auth } from "~/server/auth";
 import { redirect } from "next/navigation";
-import { Button } from "~/components/ui/button";
+import { LoginForm } from "~/components/login-form";
+import { Card } from "~/components/ui/card";
+import { FlickeringGrid } from "~/components/ui/flickering-grid";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -10,36 +12,20 @@ export default async function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcome to Red Team AI
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to access your AI agent platform
-          </p>
-        </div>
-        
-        <div className="space-y-4">
-          <form
-            action={async () => {
-              "use server";
-              await signIn("auth0", { redirectTo: "/agents" });
-            }}
-          >
-            <Button type="submit" className="w-full">
-              Sign in with Auth0
-            </Button>
-          </form>
-        </div>
-        
-        <div className="text-center">
-          <p className="text-xs text-gray-500">
-            Secure authentication powered by Auth0
-          </p>
-        </div>
+    <div className="relative bg-background h-screen flex flex-col items-center overflow-hidden justify-center gap-6 p-6 md:p-10">
+      <FlickeringGrid 
+        className="absolute inset-0 z-0"
+        squareSize={4}
+        gridGap={6}
+        flickerChance={0.3}
+        color="rgb(148, 163, 184)"
+        maxOpacity={0.2}
+      />
+      <div className="relative z-10 w-full max-w-sm">
+        <Card className="px-6">
+          <LoginForm />
+        </Card>
       </div>
-    </main>
+    </div>
   );
 }
