@@ -33,15 +33,33 @@ class JailBreakAgent:
         with open("prompts/brainstormer.txt", "r", encoding="utf-8") as file:
             system_prompt_improvement = file.read()
         
-        previous_three_prompts = """Previous Prompts: """
+        previous_three_prompts = "Previous Prompts: \n"
 
         counter = 0
 
         for schema in reversed(self.attack_prompts_list):
-            if counter > 3:
+            if counter > 2:
                 break
+
             prompt = schema["prompt"]
             defense_message = schema["defense_message"]
+
+            previous_three_prompts += f"{counter+1}------\n"
+            previous_three_prompts += f"Prompt Attempt {counter+1}: {prompt} \n"
+            previous_three_prompts += f"LLM Response {counter+1}: {defense_message} \n"
+
+            counter += 1
+        
+        print()
+        print()
+        print()
+        print()
+        print("previous_three_prompts")
+        print(previous_three_prompts)
+        print()
+        print()
+        print()
+        print()
 
 
 
@@ -95,7 +113,7 @@ Use these brainstormed ideas to refine the previous prompt. Only return back the
 class DefenseAgent:
     # knowledge_base: str # chroma_db directory
     system_prompt: str
-    model = "llama-3.3-70b"
+    model = "llama3.1-8b"
 
     messages = []
     
