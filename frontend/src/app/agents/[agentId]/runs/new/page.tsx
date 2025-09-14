@@ -10,11 +10,12 @@ import { Label } from "~/components/ui/label";
 import { Checkbox } from "~/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Slider } from "~/components/ui/slider";
 import { Badge } from "~/components/ui/badge";
 import { ArrowLeft, Info, Shield, Zap } from "lucide-react";
 import { useNavigation } from "~/contexts/navigation-context";
+import { useAgent } from "~/contexts/agent-context";
+import { AgentCard } from "~/components/agent-card";
 
 const RISK_CATEGORIES = [
   { id: "hateful", label: "Hateful and Unfair Content", description: "Content related to hate or unfair representations" },
@@ -59,6 +60,8 @@ export default function NewRun({
 
   const { agentId } = use(params);
   const { setBackUrl } = useNavigation();
+
+  const { selectedAgent } = useAgent()
 
   useEffect(() => {
     setBackUrl(`/agents/${agentId}/runs`);
@@ -126,260 +129,275 @@ export default function NewRun({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 mx-auto my-auto">
-      <Tabs defaultValue="basic" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="basic">Basic Info</TabsTrigger>
-          <TabsTrigger value="risks">Risk Categories</TabsTrigger>
-          <TabsTrigger value="attacks">Attack Strategies</TabsTrigger>
-          <TabsTrigger value="advanced">Advanced Settings</TabsTrigger>
-        </TabsList>
+    
 
-        {/* Basic Information */}
-        <TabsContent value="basic" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Info className="h-5 w-5" />
-                Test Configuration
-              </CardTitle>
-              <CardDescription>
-                Basic information about your AI red teaming test
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="testName">Test Name *</Label>
-                  <Input
-                    id="testName"
-                    placeholder="e.g., Safety Validation v1.0"
-                    value={testName}
-                    onChange={(e) => setTestName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="endpoint">Target Endpoint *</Label>
-                  <Input
-                    id="endpoint"
-                    placeholder="https://api.example.com/chat"
-                    value={targetEndpoint}
-                    onChange={(e) => setTargetEndpoint(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <textarea
-                  id="description"
-                  placeholder="Describe what this test aims to validate..."
-                  value={description}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
-                  rows={3}
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+    <form onSubmit={handleSubmit} className="space-y-6 flex flex-col justify-start">
+      {selectedAgent &&
+         <AgentCard
+          agent={selectedAgent}
+          showActions={false}
+        />
+      }
 
-        {/* Risk Categories */}
-        <TabsContent value="risks" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Risk Categories
-              </CardTitle>
-              <CardDescription>
-                Select the types of safety risks you want to test for
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {RISK_CATEGORIES.map((risk) => (
-                  <div key={risk.id} className="flex items-start space-x-3 p-4 border rounded-lg bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50">
-                    <Checkbox
-                      id={risk.id}
-                      checked={selectedRisks.includes(risk.id)}
-                      onCheckedChange={() => handleRiskToggle(risk.id)}
-                    />
-                    <div className="flex-1">
-                      <Label htmlFor={risk.id} className="font-medium cursor-pointer">
-                        {risk.label}
-                      </Label>
-                      <p className="text-sm text-gray-600 mt-1">{risk.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+      <div className="space-y-2">
+        <Label htmlFor="testName">Test Name*</Label>
+        <Input
+          id="testName"
+          placeholder="e.g., Safety Validation v1.0"
+          value={testName}
+          onChange={(e) => setTestName(e.target.value)}
+          required
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <textarea
+          id="description"
+          placeholder="Describe what this test aims to validate..."
+          value={description}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+          rows={3}
+          className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        />
+      </div>
+      
+      {/* Basic Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Info className="h-5 w-5" />
+            Test Configuration
+          </CardTitle>
+          <CardDescription>
+            Basic information about your AI red teaming test
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="testName">Test Name *</Label>
+              <Input
+                id="testName"
+                placeholder="e.g., Safety Validation v1.0"
+                value={testName}
+                onChange={(e) => setTestName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="endpoint">Target Endpoint *</Label>
+              <Input
+                id="endpoint"
+                placeholder="https://api.example.com/chat"
+                value={targetEndpoint}
+                onChange={(e) => setTargetEndpoint(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <textarea
+              id="description"
+              placeholder="Describe what this test aims to validate..."
+              value={description}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+              rows={3}
+              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Attack Strategies */}
-        <TabsContent value="attacks" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5" />
-                Attack Strategies
-              </CardTitle>
-              <CardDescription>
-                Choose the techniques used to probe your AI system
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
+      {/* Risk Categories */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Risk Categories
+          </CardTitle>
+          <CardDescription>
+            Select the types of safety risks you want to test for
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {RISK_CATEGORIES.map((risk) => (
+              <div key={risk.id} className="flex items-start space-x-3 p-4 border rounded-lg bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50">
                 <Checkbox
-                  id="advanced-mode"
-                  checked={isAdvancedMode}
-                  onCheckedChange={(checked) => setIsAdvancedMode(checked === true)}
+                  id={risk.id}
+                  checked={selectedRisks.includes(risk.id)}
+                  onCheckedChange={() => handleRiskToggle(risk.id)}
                 />
-                <Label htmlFor="advanced-mode">Advanced Mode (Show all 20+ attack strategies)</Label>
+                <div className="flex-1">
+                  <Label htmlFor={risk.id} className="font-medium cursor-pointer">
+                    {risk.label}
+                  </Label>
+                  <p className="text-sm text-gray-600 mt-1">{risk.description}</p>
+                </div>
               </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-              {!isAdvancedMode ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {BASIC_ATTACKS.map((attack) => (
-                    <div key={attack.id} className="flex items-start space-x-3 p-4 border rounded-lg bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50">
-                      <Checkbox
-                        id={attack.id}
-                        checked={selectedAttacks.includes(attack.id)}
-                        onCheckedChange={() => handleAttackToggle(attack.id)}
-                      />
-                      <div className="flex-1">
-                        <Label htmlFor={attack.id} className="font-medium cursor-pointer">
-                          {attack.label}
-                        </Label>
-                        <p className="text-sm text-gray-600 mt-1">{attack.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p className="text-sm text-gray-600">Select from all available PyRIT attack strategies:</p>
-                  <div className="flex flex-wrap gap-2">
-                    {ADVANCED_ATTACKS.map((attack) => (
-                      <Badge
-                        key={attack}
-                        variant={selectedAttacks.includes(attack) ? "default" : "outline"}
-                        className="cursor-pointer"
-                        onClick={() => handleAttackToggle(attack)}
-                      >
-                        {attack}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Advanced Settings */}
-        <TabsContent value="advanced" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Test Parameters</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Number of Test Prompts: {numPrompts[0]}</Label>
-                  <Slider
-                    value={numPrompts}
-                    onValueChange={setNumPrompts}
-                    max={1000}
-                    min={10}
-                    step={10}
-                    className="w-full"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="timeout">Timeout per Request (seconds)</Label>
-                  <Input
-                    id="timeout"
-                    type="number"
-                    value={timeout}
-                    onChange={(e) => setTimeout(Number(e.target.value))}
-                    min={5}
-                    max={300}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="concurrency">Concurrent Requests</Label>
-                  <Input
-                    id="concurrency"
-                    type="number"
-                    value={concurrency}
-                    onChange={(e) => setConcurrency(Number(e.target.value))}
-                    min={1}
-                    max={20}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Evaluation Settings</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Attack Success Rate Threshold: {successThreshold[0]}%</Label>
-                  <Slider
-                    value={successThreshold}
-                    onValueChange={setSuccessThreshold}
-                    max={50}
-                    min={0}
-                    step={1}
-                    className="w-full"
-                  />
-                  <p className="text-xs text-gray-600">Tests above this threshold are considered failing</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="logging"
-                    checked={enableLogging}
-                    onCheckedChange={(checked) => setEnableLogging(checked === true)}
-                  />
-                  <Label htmlFor="logging">Enable Detailed Logging</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="report"
-                    checked={generateReport}
-                    onCheckedChange={(checked) => setGenerateReport(checked === true)}
-                  />
-                  <Label htmlFor="report">Generate Report (PDF/JSON)</Label>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Attack Strategies */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5" />
+            Attack Strategies
+          </CardTitle>
+          <CardDescription>
+            Choose the techniques used to probe your AI system
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="advanced-mode"
+              checked={isAdvancedMode}
+              onCheckedChange={(checked) => setIsAdvancedMode(checked === true)}
+            />
+            <Label htmlFor="advanced-mode">Advanced Mode (Show all 20+ attack strategies)</Label>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Custom Seed Prompts</CardTitle>
-              <CardDescription>
-                Add your own test prompts (optional - one per line)
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <textarea
-                placeholder="Write hate speech about..."
-                value={customPrompts}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCustomPrompts(e.target.value)}
-                rows={6}
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+          {!isAdvancedMode ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {BASIC_ATTACKS.map((attack) => (
+                <div key={attack.id} className="flex items-start space-x-3 p-4 border rounded-lg bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50">
+                  <Checkbox
+                    id={attack.id}
+                    checked={selectedAttacks.includes(attack.id)}
+                    onCheckedChange={() => handleAttackToggle(attack.id)}
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor={attack.id} className="font-medium cursor-pointer">
+                      {attack.label}
+                    </Label>
+                    <p className="text-sm text-gray-600 mt-1">{attack.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">Select from all available PyRIT attack strategies:</p>
+              <div className="flex flex-wrap gap-2">
+                {ADVANCED_ATTACKS.map((attack) => (
+                  <Badge
+                    key={attack}
+                    variant={selectedAttacks.includes(attack) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => handleAttackToggle(attack)}
+                  >
+                    {attack}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Advanced Settings */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Test Parameters</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Number of Test Prompts: {numPrompts[0]}</Label>
+              <Slider
+                value={numPrompts}
+                onValueChange={setNumPrompts}
+                max={1000}
+                min={10}
+                step={10}
+                className="w-full"
               />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="timeout">Timeout per Request (seconds)</Label>
+              <Input
+                id="timeout"
+                type="number"
+                value={timeout}
+                onChange={(e) => setTimeout(Number(e.target.value))}
+                min={5}
+                max={300}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="concurrency">Concurrent Requests</Label>
+              <Input
+                id="concurrency"
+                type="number"
+                value={concurrency}
+                onChange={(e) => setConcurrency(Number(e.target.value))}
+                min={1}
+                max={20}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Evaluation Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Attack Success Rate Threshold: {successThreshold[0]}%</Label>
+              <Slider
+                value={successThreshold}
+                onValueChange={setSuccessThreshold}
+                max={50}
+                min={0}
+                step={1}
+                className="w-full"
+              />
+              <p className="text-xs text-gray-600">Tests above this threshold are considered failing</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="logging"
+                checked={enableLogging}
+                onCheckedChange={(checked) => setEnableLogging(checked === true)}
+              />
+              <Label htmlFor="logging">Enable Detailed Logging</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="report"
+                checked={generateReport}
+                onCheckedChange={(checked) => setGenerateReport(checked === true)}
+              />
+              <Label htmlFor="report">Generate Report (PDF/JSON)</Label>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Custom Seed Prompts</CardTitle>
+          <CardDescription>
+            Add your own test prompts (optional - one per line)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <textarea
+            placeholder="Write hate speech about..."
+            value={customPrompts}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCustomPrompts(e.target.value)}
+            rows={6}
+            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+          />
+        </CardContent>
+      </Card>
 
       {/* Submit Button */}
       <div className="flex justify-end space-x-4">
