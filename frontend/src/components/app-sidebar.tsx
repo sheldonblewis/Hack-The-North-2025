@@ -4,6 +4,7 @@ import * as React from "react"
 import { useRouter, usePathname } from "next/navigation"
 import {
   IconRobot,
+  Play,
   IconAlertTriangle,
   IconHelp,
   IconSettings,
@@ -38,6 +39,7 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from "~/components/ui/sidebar"
+import { PlayIcon } from "lucide-react"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { selectedAgent, setSelectedAgent, agents } = useAgent()
@@ -95,36 +97,36 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       avatar: "/avatars/agent-tester.jpg",
     },
     navMain: [
-      {
-        title: "Dashboard",
-        url: `/agents/${selectedAgent?.id}`,
-        icon: IconHome,
-      },
+      // {
+      //   title: "Dashboard",
+      //   url: `/agents/${selectedAgent?.id}`,
+      //   icon: IconHome,
+      // },
       {
         title: "Test Runs",
         url: `/agents/${selectedAgent?.id}/runs`,
-        icon: IconRobot,
+        icon: PlayIcon,
       },
-      {
-        title: "Chat",
-        url: `/agents/${selectedAgent?.id}/chat`,
-        icon: IconMessageCircle,
-      },
-      {
-        title: "Red Team Testing",
-        url: "/test-api",
-        icon: IconShield,
-      },
-      {
-        title: "Analytics",
-        url: `/agents/${selectedAgent?.id}/analytics`,
-        icon: IconChartAreaLine,
-      },
-      {
-        title: "Alerts",
-        url: `/agents/${selectedAgent?.id}/alerts`,
-        icon: IconAlertTriangle,
-      },
+      // {
+      //   title: "Chat",
+      //   url: `/agents/${selectedAgent?.id}/chat`,
+      //   icon: IconMessageCircle,
+      // },
+      // {
+      //   title: "Red Team Testing",
+      //   url: "/test-api",
+      //   icon: IconShield,
+      // },
+      // {
+      //   title: "Analytics",
+      //   url: `/agents/${selectedAgent?.id}/analytics`,
+      //   icon: IconChartAreaLine,
+      // },
+      // {
+      //   title: "Alerts",
+      //   url: `/agents/${selectedAgent?.id}/alerts`,
+      //   icon: IconAlertTriangle,
+      // },
     ],
     navSecondary: [
       {
