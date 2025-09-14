@@ -65,6 +65,14 @@ export default function AgentChat({
       const foundAgent = agentsData.find(a => a._id === agentId);
       if (foundAgent) {
         setAgent(foundAgent);
+
+        // Auto-populate config with current agent's stored values
+        setConfig(prev => ({
+          ...prev,
+          attackPrompt: foundAgent.objective || prev.attackPrompt,
+          defensePrompt: foundAgent.defense_system_prompt || prev.defensePrompt,
+          iterations: foundAgent.iterations || prev.iterations
+        }));
       }
     } catch (error) {
       console.error('Failed to load agent:', error);
@@ -290,6 +298,16 @@ export default function AgentChat({
                     onChange={(e) => {
                       const selectedAgent = agents.find(a => a._id === e.target.value);
                       setAgent(selectedAgent || null);
+
+                      // Auto-populate config with agent's stored values
+                      if (selectedAgent) {
+                        setConfig(prev => ({
+                          ...prev,
+                          attackPrompt: selectedAgent.objective || prev.attackPrompt,
+                          defensePrompt: selectedAgent.defense_system_prompt || prev.defensePrompt,
+                          iterations: selectedAgent.iterations || prev.iterations
+                        }));
+                      }
                     }}
                   >
                     <option value="" disabled>

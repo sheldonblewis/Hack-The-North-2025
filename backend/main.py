@@ -186,12 +186,13 @@ async def run_simulation(agent_id: str, request: StartSimulationRequest):
         if not agent:
             raise HTTPException(status_code=404, detail="Agent not found")
 
-        # Run simulation with database (original logic)
+        # Run simulation with database (reuse existing agent)
         result = start_simulation_with_db(
             iterations=request.iterations,
             attack_objective=agent["objective"],
             initial_attack_prompt=request.initial_attack_prompt,
             defense_system_prompt=request.defense_system_prompt,
+            existing_agent_id=agent_id,
             agent_name=agent["name"]
         )
 
@@ -275,12 +276,16 @@ async def run_streaming_simulation(agent_id: str, request: StartSimulationReques
                 yield f"data: {json.dumps(error_data)}\n\n"
                 return
 
-            # Run streaming simulation with database integration
+            # Debug: Log the agent_id being passed
+            logger.info(f"DEBUG: Calling streaming simulation with existing_agent_id: {agent_id}")
+
+            # Run streaming simulation with database integration (reuse existing agent)
             streaming_generator = start_streaming_simulation_with_db(
                 iterations=request.iterations,
                 attack_objective=agent["objective"],
                 initial_attack_prompt=request.initial_attack_prompt,
                 defense_system_prompt=request.defense_system_prompt,
+                existing_agent_id=agent_id,
                 agent_name=agent["name"]
             )
 
