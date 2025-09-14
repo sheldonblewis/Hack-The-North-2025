@@ -81,6 +81,8 @@ class CreateAgentRequest(BaseModel):
     objective: str
     model_provider: str = "cerebras"
     model_name: str = "llama-4-scout-17b-16e-instruct"
+    defense_system_prompt: str = None
+    iterations: int = None
 
 class StartSimulationRequest(BaseModel):
     iterations: int = 4
@@ -103,7 +105,9 @@ async def create_agent(request: CreateAgentRequest):
             name=request.name,
             objective=request.objective,
             model_provider=request.model_provider,
-            model_name=request.model_name
+            model_name=request.model_name,
+            defense_system_prompt=request.defense_system_prompt,
+            iterations=request.iterations
         )
         return {"agent_id": agent_id, "message": "Agent created successfully"}
     except Exception as e:

@@ -5,6 +5,39 @@ export const agentRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({
       name: z.string(),
+      objective: z.string(),
+      defensePrompt: z.string(),
+      iterations: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      // Call Python backend to create agent in MongoDB
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/agents`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: input.name,
+          objective: input.objective,
+          defense_system_prompt: input.defensePrompt,
+          iterations: input.iterations,
+          model_provider: "cerebras",
+          model_name: "llama-4-scout-17b-16e-instruct"
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create agent in backend');
+      }
+
+      const result = await response.json();
+      return { id: result.agent_id, name: input.name };
+    }),
+
+  // Keep existing Prisma-based methods for compatibility
+  createPrisma: protectedProcedure
+    .input(z.object({
+      name: z.string(),
       description: z.string().optional(),
       endpoint: z.string().url(),
     }))

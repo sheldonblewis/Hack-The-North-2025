@@ -6,6 +6,8 @@ export interface Agent {
   _id: string;
   name: string;
   objective: string;
+  defense_system_prompt: string;
+  iterations: number;
   model_provider: string;
   model_name: string;
   status: string;
