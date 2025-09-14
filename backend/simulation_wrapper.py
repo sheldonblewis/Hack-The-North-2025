@@ -54,7 +54,7 @@ def start_simulation_with_db(iterations: int, attack_objective: str,
     try:
         # Start with user's custom prompt directly (skip seed prompts)
         defense_message = defense_agent.ask(initial_attack_prompt)
-        state = attack_agent.evaluate_broken(defense_message)
+        state, improvement_suggestion = attack_agent.evaluate_broken_with_suggestions(defense_message)
 
         total_attempts += 1
 
@@ -64,7 +64,8 @@ def start_simulation_with_db(iterations: int, attack_objective: str,
             attack_strategy="custom_prompt",
             prompt=initial_attack_prompt,
             response=defense_message,
-            evaluation_result=state
+            evaluation_result=state,
+            improvement_suggestion=improvement_suggestion
         )
 
         if state:
@@ -148,8 +149,8 @@ def seed_simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
         # Add to history (preserve original behavior)
         attack.attack_prompts_list.append(schema)
 
-        # Evaluate (preserve original behavior)
-        status = attack.evaluate_broken(schema["defense_message"])
+        # Evaluate (preserve original behavior with suggestions)
+        status, improvement_suggestion = attack.evaluate_broken_with_suggestions(schema["defense_message"])
 
         # Save to database (NEW)
         db_integration.save_attack_attempt(
@@ -157,7 +158,8 @@ def seed_simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
             attack_strategy=strategy,
             prompt=schema["prompt"],
             response=schema["defense_message"],
-            evaluation_result=status
+            evaluation_result=status,
+            improvement_suggestion=improvement_suggestion
         )
 
         # Return original result
@@ -179,7 +181,8 @@ def seed_simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
                 attack_strategy=strategy,
                 prompt=attack_prompt,
                 response="Error: Response too long for API limit",
-                evaluation_result=False
+                evaluation_result=False,
+                improvement_suggestion=""
             )
             return False
         else:
@@ -202,8 +205,8 @@ def simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
         # Add to history (original logic)
         attack.attack_prompts_list.append(schema)
 
-        # Evaluate (original logic)
-        status = attack.evaluate_broken(schema["defense_message"])
+        # Evaluate (original logic with suggestions)
+        status, improvement_suggestion = attack.evaluate_broken_with_suggestions(schema["defense_message"])
 
         # Save to database (NEW)
         db_integration.save_attack_attempt(
@@ -211,7 +214,8 @@ def simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
             attack_strategy=strategy,
             prompt=schema["prompt"],
             response=schema["defense_message"],
-            evaluation_result=status
+            evaluation_result=status,
+            improvement_suggestion=improvement_suggestion
         )
 
         # Return original result
@@ -228,7 +232,8 @@ def simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
                 attack_strategy=strategy,
                 prompt=previous_prompt,
                 response="Error: Response too long for API limit",
-                evaluation_result=False
+                evaluation_result=False,
+                improvement_suggestion=""
             )
             return False
         else:
@@ -302,10 +307,10 @@ def start_streaming_simulation_with_db(iterations: int, attack_objective: str,
                         # This is a complete attack/defense exchange
                         total_attempts += 1
 
-                        # We need to evaluate if this was successful
+                        # We need to evaluate if this was successful (with suggestions)
                         # Create temporary agents to evaluate
                         temp_attack_agent = JailBreakAgent(objective=attack_objective)
-                        evaluation_result = temp_attack_agent.evaluate_broken(item["defense_message"])
+                        evaluation_result, improvement_suggestion = temp_attack_agent.evaluate_broken_with_suggestions(item["defense_message"])
 
                         if evaluation_result:
                             successful_attempts += 1
@@ -316,7 +321,8 @@ def start_streaming_simulation_with_db(iterations: int, attack_objective: str,
                             attack_strategy="streaming_simulation",
                             prompt=item["attack_prompt"],
                             response=item["defense_message"],
-                            evaluation_result=evaluation_result
+                            evaluation_result=evaluation_result,
+                            improvement_suggestion=improvement_suggestion
                         )
 
     except StopIteration as e:

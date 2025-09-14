@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
+import { useAgent } from "~/contexts/agent-context";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -12,6 +13,7 @@ import { IconRobot } from "@tabler/icons-react";
 
 export default function NewAgentPage() {
   const router = useRouter();
+  const { refreshAgents, setSelectedAgent, agents } = useAgent();
 
   // Agent creation form state
   const [agentName, setAgentName] = useState("");
@@ -24,16 +26,35 @@ export default function NewAgentPage() {
 
   // tRPC mutation for creating agent
   const createAgent = api.agent.create.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setIsSubmitting(false);
       alert(`Agent "${agentName}" created successfully!`);
+
       // Reset form
       setAgentName("");
       setDefensePrompt("");
       setAttackPrompt("");
       setIterations(5);
-      // Redirect back to agents page
-      router.push("/agents");
+
+      // Refresh agents list to include the new agent
+      await refreshAgents();
+
+      // Auto-select the newly created agent
+      // The data should contain the agent ID
+      if (data && typeof data === 'object' && 'id' in data) {
+        // Wait a bit for the agents context to update
+        setTimeout(() => {
+          const newAgent = agents.find(a => a.id === data.id);
+          if (newAgent) {
+            setSelectedAgent(newAgent);
+          }
+        }, 100);
+
+        // Redirect to the new agent's runs page
+        router.push(`/agents/${data.id}/runs`);
+      } else {
+        router.push("/agents");
+      }
     },
     onError: (error) => {
       setIsSubmitting(false);

@@ -40,7 +40,7 @@ class DatabaseIntegration:
 
     def save_attack_attempt(self, agent_id: str, attack_strategy: str,
                           prompt: str, response: str, evaluation_result: bool,
-                          response_time: int = None) -> str:
+                          improvement_suggestion: str = None, response_time: int = None) -> str:
         """Save individual attack attempt to database"""
 
         # Determine status based on evaluation
@@ -60,6 +60,7 @@ class DatabaseIntegration:
             risk_score=risk_score,
             response_time=response_time,
             evaluation_result=evaluation_result,
+            improvement_suggestion=improvement_suggestion,
             timestamp=datetime.utcnow()
         )
 
