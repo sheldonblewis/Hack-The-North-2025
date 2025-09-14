@@ -11,7 +11,7 @@ import {
   IconChevronDown,
   IconChartAreaLine,
   IconMessageCircle,
-  IconCornerLeftUp,
+  IconShield,
 } from "@tabler/icons-react"
 
 import { useAgent } from "~/contexts/agent-context"
@@ -35,57 +35,19 @@ import {
   SidebarMenuItem,
   SidebarGroup,
   SidebarGroupContent,
-  useSidebar,
 } from "~/components/ui/sidebar"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { selectedAgent, setSelectedAgent, agents } = useAgent()
-  const { setOpen } = useSidebar()
   const router = useRouter()
   const pathname = usePathname()
-  const [currentTime, setCurrentTime] = React.useState('')
-
-  // Update time every second
-  React.useEffect(() => {
-    const updateTime = () => {
-      setCurrentTime(new Date().toLocaleTimeString('en-US', { 
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      }))
-    }
-    
-    updateTime() // Initial call
-    const timer = setInterval(updateTime, 1000)
-    
-    return () => clearInterval(timer)
-  }, [])
 
   const handleAgentChange = (agent: typeof selectedAgent) => {
     setSelectedAgent(agent)
     if (agent) {
-      setOpen(true) // Expand sidebar when agent is selected
       router.push(`/agents/${agent.id}/runs`)
     }
   }
-
-  const handleGoToAgents = () => {
-    router.push('/agents')
-  }
-
-  // Auto-collapse sidebar when no agent is selected or not on agent route
-  React.useEffect(() => {
-    const agentMatch = pathname.match(/^\/agents\/([^\/]+)/)
-    const hasAgentInUrl = !!agentMatch
-    const isAgentsPage = pathname === '/agents'
-    
-    if (hasAgentInUrl) {
-      setOpen(true) // Keep sidebar open when on agent routes
-    } else if (isAgentsPage || !selectedAgent) {
-      setOpen(false) // Collapse when on agents page or no agent selected
-    }
-  }, [selectedAgent, pathname, setOpen])
 
   const data = {
     user: {
@@ -93,33 +55,43 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       email: "tester@example.com",
       avatar: "/avatars/agent-tester.jpg",
     },
-    navMain: [
+    navMain: selectedAgent ? [
       {
-        title: "Test Runs",
-        url: `/agents/${selectedAgent?.id}/runs`,
+        title: "Runs",
+        url: `/agents/${selectedAgent.id}/runs`,
         icon: IconRobot,
       },
       {
         title: "Metrics Dashboard",
-        url: `/agents/${selectedAgent?.id}`,
+        url: `/agents/${selectedAgent.id}`,
         icon: IconHome,
       },
       {
         title: "Chat",
-        url: `/agents/${selectedAgent?.id}/chat`,
+        url: `/agents/${selectedAgent.id}/chat`,
         icon: IconMessageCircle,
       },
       {
+        title: "Runs",
+        url: `/agents/${selectedAgent.id}/runs`,
+        icon: IconRobot,
+      },
+      {
+        title: "Red Team Testing",
+        url: "/test-api",
+        icon: IconShield,
+      },
+      {
         title: "Analytics",
-        url: `/agents/${selectedAgent?.id}/analytics`,
+        url: `/agents/${selectedAgent.id}/analytics`,
         icon: IconChartAreaLine,
       },
       {
         title: "Alerts",
-        url: `/agents/${selectedAgent?.id}/alerts`,
+        url: `/agents/${selectedAgent.id}/alerts`,
         icon: IconAlertTriangle,
       },
-    ],
+    ] : [],
     navSecondary: [
       {
         title: "Settings",
@@ -135,54 +107,72 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar collapsible="offcanvas" {...props} className="px-8 pb-8">
-      <SidebarHeader className="pb-4 pt-8 px-0">
-        <div className="flex items-baseline ">
-          <a href="/">
-            <span className="text-5xl font-black font-stretch-150%">IN-IT</span>
-          </a>
-          <span className="text-sm tabular-nums slashed-zero text-muted-foreground">
-            {currentTime}
-          </span>
-        </div>
-
-        <div className="flex items-center ">
-          <SidebarMenuButton 
-            onClick={handleGoToAgents}
-            className="size-8 p-0 hover:bg-none accent items-center justify-center tabular-nums slashed-zero"
-          >
-            <IconCornerLeftUp className="size-4 text-muted-foreground" />
-          </SidebarMenuButton>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild className="border tabular-nums slashed-zero flex-1">
-              <SidebarMenuButton className="w-full justify-between tabular-nums slashed-zero">
-                <div className="flex items-center gap-2 tabular-nums slashed-zero">
-                  <span>{selectedAgent ? selectedAgent.name : "Select Agent"}</span>
-                </div>
-                <IconChevronDown className="size-4" />
-              </SidebarMenuButton>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-[17rem] tabular-nums slashed-zero">
-              {agents.map((agent) => (
-                <DropdownMenuItem
-                  key={agent.id}
-                  onClick={() => handleAgentChange(agent)}
-                  className="flex items-center justify-between tabular-nums slashed-zero"
-                >
-                  <span>{agent.name}</span>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+    <Sidebar collapsible="offcanvas" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <a href="/">
+                <span className="text-base font-semibold">IN-IT</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       
-      <SidebarContent className="pt-2 ">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/agents">
+                    <IconHome className="size-4" />
+                    <span>Home</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild className="border tabular-nums">
+                    <SidebarMenuButton className="w-full justify-between">
+                      <div className="flex items-center gap-2">
+                        <span>{selectedAgent ? selectedAgent.name : "Select Agent"}</span>
+                      </div>
+                      <IconChevronDown className="size-4" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-64 tabular-nums">
+                    {agents.map((agent) => (
+                      <DropdownMenuItem
+                        key={agent.id}
+                        onClick={() => handleAgentChange(agent)}
+                        className="flex items-center justify-between"
+                      >
+                        <span>{agent.name}</span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        
         <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto px-0" />
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter className="px-0">
+      <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>

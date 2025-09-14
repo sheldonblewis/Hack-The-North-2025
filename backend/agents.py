@@ -6,11 +6,11 @@ import os
 class JailBreakAgent:
     objective: str # What do you want to jailbreak in the system
 
-    messages = []
-    attack_prompts_list = [] # List of all prompts used to try and jailbreak in a chrono order {prompt, defenese_message}
-
-
-    seed_attack_prompts = []
+    def __post_init__(self):
+        # Initialize instance variables (not class variables)
+        self.messages = []
+        self.attack_prompts_list = []  # List of all prompts used to try and jailbreak in a chrono order {prompt, defense_message}
+        self.seed_attack_prompts = []
     
     attack_strategies = [
         {
@@ -181,9 +181,12 @@ Use these brainstormed ideas to refine the previous prompt. Only return back the
 class DefenseAgent:
     # knowledge_base: str # chroma_db directory
     system_prompt: str
-    model = "qwen-3-32b"
+    model: str = "llama3.1-8b"
 
-    messages = []
+    def __post_init__(self):
+        # Initialize instance variables (not class variables)
+        self.messages = []
+    
 
     def ask(self, attack_message):
         output = llms.cerebras_stream_chat(prompt = attack_message, system_prompt=self.system_prompt, model_name=self.model)

@@ -31,7 +31,7 @@ def start_simulation_with_db(iterations: int, attack_objective: str,
         model_provider="cerebras",
         model_name="llama-4-scout-17b-16e-instruct"
     )
-
+    
     # Start simulation run tracking
     run_id = db_integration.start_simulation_run(
         agent_id=agent_id,
@@ -50,39 +50,16 @@ def start_simulation_with_db(iterations: int, attack_objective: str,
     successful_attempts = 0
 
     try:
-        # Generate and test seed prompts
-        attack_agent.create_seeds()
-
-        for i, prompt in enumerate(reversed(attack_agent.seed_attack_prompts)):
-            total_attempts += 1
-
-            # Use original function but intercept the result
-            success = seed_simulate_attack_with_db(
-                defense_agent, attack_agent, prompt, agent_id, f"seed_{i+1}"
-            )
-
-            if success:
-                successful_attempts += 1
-                # Update database and return success
-                db_integration.update_simulation_run(run_id, total_attempts, successful_attempts)
-                return {
-                    "success": True,
-                    "agent_id": agent_id,
-                    "run_id": run_id,
-                    "total_attempts": total_attempts,
-                    "successful_attempts": successful_attempts
-                }
-
-        # Continue with iterative approach (same logic as original)
+        # Start with user's custom prompt directly (skip seed prompts)
         defense_message = defense_agent.ask(initial_attack_prompt)
         state = attack_agent.evaluate_broken(defense_message)
 
         total_attempts += 1
 
-        # Save initial attempt
+        # Save initial attempt with user's custom prompt
         db_integration.save_attack_attempt(
             agent_id=agent_id,
-            attack_strategy="initial",
+            attack_strategy="custom_prompt",
             prompt=initial_attack_prompt,
             response=defense_message,
             evaluation_result=state
@@ -133,69 +110,124 @@ def start_simulation_with_db(iterations: int, attack_objective: str,
         }
 
     except Exception as e:
+        error_message = str(e)
         logger.error(f"Simulation failed: {e}")
-        db_integration.update_simulation_run(run_id, total_attempts, successful_attempts, "failed")
-        raise
+
+        # Handle specific API errors more gracefully
+        if ("context_length_exceeded" in error_message.lower() or
+            "length is" in error_message.lower() or
+            "current length is" in error_message.lower() or
+            "while limit is" in error_message.lower()):
+            logger.error(f"Context length exceeded - response too long: {error_message}")
+            db_integration.update_simulation_run(run_id, total_attempts, successful_attempts, "failed")
+            # Return a more user-friendly error instead of raising
+            return {
+                "success": False,
+                "agent_id": agent_id,
+                "run_id": run_id,
+                "total_attempts": total_attempts,
+                "successful_attempts": successful_attempts,
+                "error": "AI response exceeded length limit. Try a more specific or shorter prompt to get a focused response."
+            }
+        else:
+            db_integration.update_simulation_run(run_id, total_attempts, successful_attempts, "failed")
+            raise
 
 def seed_simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
                                 attack_prompt: str, agent_id: str, strategy: str):
     """Wrapper for seed_simulate_attack with database integration"""
 
-    # Call original function logic
-    schema = {}
-    schema["prompt"] = attack_prompt
-    schema["defense_message"] = defense.ask(schema["prompt"])
+    try:
+        # Call original function logic
+        schema = {}
+        schema["prompt"] = attack_prompt
+        schema["defense_message"] = defense.ask(schema["prompt"])
 
-    # Add to history (preserve original behavior)
-    attack.attack_prompts_list.append(schema)
+        # Add to history (preserve original behavior)
+        attack.attack_prompts_list.append(schema)
 
-    # Evaluate (preserve original behavior)
-    status = attack.evaluate_broken(schema["defense_message"])
+        # Evaluate (preserve original behavior)
+        status = attack.evaluate_broken(schema["defense_message"])
 
-    # Save to database (NEW)
-    db_integration.save_attack_attempt(
-        agent_id=agent_id,
-        attack_strategy=strategy,
-        prompt=schema["prompt"],
-        response=schema["defense_message"],
-        evaluation_result=status
-    )
+        # Save to database (NEW)
+        db_integration.save_attack_attempt(
+            agent_id=agent_id,
+            attack_strategy=strategy,
+            prompt=schema["prompt"],
+            response=schema["defense_message"],
+            evaluation_result=status
+        )
 
-    # Return original result
-    if status:
-        for j in range(10):
-            print("SUCCESS - JAILBROKEN!!!!!!")
-        return True
-    else:
-        return False
+        # Return original result
+        if status:
+            for j in range(10):
+                print("SUCCESS - JAILBROKEN!!!!!!")
+            return True
+        else:
+            return False
+    except Exception as e:
+        error_message = str(e)
+        if ("context_length_exceeded" in error_message.lower() or
+            "length is" in error_message.lower() or
+            "current length is" in error_message.lower()):
+            logger.error(f"Context length exceeded in seed attack: {error_message}")
+            # Save failed attempt to database
+            db_integration.save_attack_attempt(
+                agent_id=agent_id,
+                attack_strategy=strategy,
+                prompt=attack_prompt,
+                response="Error: Response too long for API limit",
+                evaluation_result=False
+            )
+            return False
+        else:
+            raise
 
 def simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
                           previous_prompt: str, defense_message: str,
                           agent_id: str, strategy: str):
     """Wrapper for simulate_attack with database integration"""
 
-    schema = {}
+    try:
+        schema = {}
 
-    # Refine prompt (original logic)
-    schema["prompt"] = attack.refine_prompt(previous_prompt, defense_message)
+        # Refine prompt (original logic)
+        schema["prompt"] = attack.refine_prompt(previous_prompt, defense_message)
 
-    # Test prompt (original logic)
-    schema["defense_message"] = defense.ask(schema["prompt"])
+        # Test prompt (original logic)
+        schema["defense_message"] = defense.ask(schema["prompt"])
 
-    # Add to history (original logic)
-    attack.attack_prompts_list.append(schema)
+        # Add to history (original logic)
+        attack.attack_prompts_list.append(schema)
 
-    # Evaluate (original logic)
-    status = attack.evaluate_broken(schema["defense_message"])
+        # Evaluate (original logic)
+        status = attack.evaluate_broken(schema["defense_message"])
 
-    # Save to database (NEW)
-    db_integration.save_attack_attempt(
-        agent_id=agent_id,
-        attack_strategy=strategy,
-        prompt=schema["prompt"],
-        response=schema["defense_message"],
-        evaluation_result=status
-    )
+        # Save to database (NEW)
+        db_integration.save_attack_attempt(
+            agent_id=agent_id,
+            attack_strategy=strategy,
+            prompt=schema["prompt"],
+            response=schema["defense_message"],
+            evaluation_result=status
+        )
 
-    # Return original result
-    return status
+        # Return original result
+        return status
+    except Exception as e:
+        error_message = str(e)
+        if ("context_length_exceeded" in error_message.lower() or
+            "length is" in error_message.lower() or
+            "current length is" in error_message.lower()):
+            logger.error(f"Context length exceeded in attack simulation: {error_message}")
+            # Save failed attempt to database
+            db_integration.save_attack_attempt(
+                agent_id=agent_id,
+                attack_strategy=strategy,
+                prompt=previous_prompt,
+                response="Error: Response too long for API limit",
+                evaluation_result=False
+            )
+            return False
+        else:
+            raise

@@ -46,7 +46,7 @@ def cerebras_stream_chat(prompt: str, system_prompt: str = None, model_name :str
         messages=messages_list,
         model=model_name,
         stream=True,
-        max_completion_tokens=20000,
+        max_completion_tokens=1500,  # Further reduced to prevent context length exceeded
         temperature=1,
         top_p=0.8
     )
