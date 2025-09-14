@@ -12,6 +12,8 @@ export interface Agent {
   model_name: string;
   status: string;
   created_at: string;
+  defense_system_prompt?: string;
+  iterations?: number;
 }
 
 export interface AttackResult {

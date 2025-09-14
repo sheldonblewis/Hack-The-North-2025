@@ -9,9 +9,13 @@ logger = logging.getLogger(__name__)
 
 def start_simulation_with_db(iterations: int, attack_objective: str,
                            initial_attack_prompt: str, defense_system_prompt: str,
-                           agent_name: str = None) -> dict:
+                           existing_agent_id: str, agent_name: str = None) -> dict:
     """
     Wrapper for start_simulation that adds database integration
+
+    Args:
+        existing_agent_id: Required - agent ID to use for simulation run.
+                          No new agents will be created.
 
     Returns:
         dict: {
@@ -23,14 +27,12 @@ def start_simulation_with_db(iterations: int, attack_objective: str,
         }
     """
 
-    # Save agent to database
-    agent_name = agent_name or f"Agent_{int(time.time())}"
-    agent_id = db_integration.save_agent(
-        name=agent_name,
-        objective=attack_objective,
-        model_provider="cerebras",
-        model_name="llama-4-scout-17b-16e-instruct"
-    )
+    # Only use existing agents - no new agent creation allowed
+    if not existing_agent_id:
+        raise ValueError("existing_agent_id is required - no new agent creation allowed")
+
+    agent_id = existing_agent_id
+    logger.info(f"Using existing agent ID: {agent_id}")
     
     # Start simulation run tracking
     run_id = db_integration.start_simulation_run(
@@ -233,9 +235,13 @@ def simulate_attack_with_db(defense: DefenseAgent, attack: JailBreakAgent,
             raise
 def start_streaming_simulation_with_db(iterations: int, attack_objective: str,
                                      initial_attack_prompt: str, defense_system_prompt: str,
-                                     agent_name: str = None):
+                                     existing_agent_id: str, agent_name: str = None):
     """
     Streaming version that bridges the new generator-based simulation with database integration
+
+    Args:
+        existing_agent_id: Required - agent ID to use for simulation run.
+                          No new agents will be created.
 
     Yields streaming metadata and saves results to database
 
@@ -246,14 +252,15 @@ def start_streaming_simulation_with_db(iterations: int, attack_objective: str,
         dict: Final results with success status and statistics
     """
 
-    # Save agent to database
-    agent_name = agent_name or f"Agent_{int(time.time())}"
-    agent_id = db_integration.save_agent(
-        name=agent_name,
-        objective=attack_objective,
-        model_provider="cerebras",
-        model_name="llama-4-scout-17b-16e-instruct"
-    )
+    # Debug: Log what we received
+    logger.info(f"DEBUG: start_streaming_simulation_with_db called with existing_agent_id: {existing_agent_id}")
+
+    # Only use existing agents - no new agent creation allowed
+    if not existing_agent_id:
+        raise ValueError("existing_agent_id is required - no new agent creation allowed")
+
+    agent_id = existing_agent_id
+    logger.info(f"Using existing agent ID: {agent_id}")
 
     # Start simulation run tracking
     run_id = db_integration.start_simulation_run(

@@ -111,11 +111,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: IconMessageCircle,
       },
       {
-        title: "Red Team Testing",
-        url: "/test-api",
-        icon: IconShield,
-      },
-      {
         title: "Analytics",
         url: `/agents/${selectedAgent?.id}/analytics`,
         icon: IconChartAreaLine,

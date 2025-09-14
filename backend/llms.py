@@ -14,32 +14,31 @@ cereb = Cerebras(api_key=CEREBRAS_API_KEY)
 
 
 def cohere_stream_chat(prompt: str, system_prompt:str = None):
-    # response = co.chat_stream(
-    #     model="command-r7b-12-2024",
-    #         messages=[{"role": "user", "content": prompt}],
-    # )
-
     messages_list = []
     if system_prompt:
         messages_list.append({"role": "system", "content": system_prompt})
     messages_list.append({"role": "user", "content": prompt})
-    
+
     response = co.chat_stream(
             model="command-light",
             messages=messages_list
     )
-    
 
+    complete_chat = ""
     for event in response:
         if event.type == "content-delta":
-            print(event.delta.message.content.text, end="", flush=True)
+            content = event.delta.message.content.text
+            print(content, end="", flush=True)
+            complete_chat += content
         elif event.type == "message-start":
             pass
         elif event.type == "message-end":
             print("", flush=True)
         elif event.type == "error":
             print(f"\n[stream error] {event.error.message}\n", flush=True)
-            return 400
+            return None
+
+    return complete_chat
 
 
 def cohere_embeddings():
