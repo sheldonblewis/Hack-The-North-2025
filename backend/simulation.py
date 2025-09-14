@@ -23,8 +23,8 @@ def simulate_attack(defense: DefenseAgent, attack: JailBreakAgent, previous_prom
     # Add to history
     attack.attack_prompts_list.append(schema)
 
-    # See if attack worked
-    status = attack.evaluate_broken(schema["defense_message"])
+    # See if attack worked (with improvement suggestions)
+    status, improvement_suggestion = attack.evaluate_broken_with_suggestions(schema["defense_message"])
 
     # STREAM evaluation result
     evaluation_metadata = {
@@ -34,7 +34,8 @@ def simulate_attack(defense: DefenseAgent, attack: JailBreakAgent, previous_prom
             "success": status,
             "status": "jailbroken" if status else "blocked",
             "attack_prompt": schema["prompt"],
-            "defense_response": schema["defense_message"]
+            "defense_response": schema["defense_message"],
+            "improvement_suggestion": improvement_suggestion if status else ""
         }
     }
     yield evaluation_metadata
@@ -61,8 +62,8 @@ def seed_simulate_attack(defense: DefenseAgent, attack: JailBreakAgent, attack_p
     # Add to history
     attack.attack_prompts_list.append(schema)
 
-    # See if attack worked
-    status = attack.evaluate_broken(schema["defense_message"])
+    # See if attack worked (with improvement suggestions)
+    status, improvement_suggestion = attack.evaluate_broken_with_suggestions(schema["defense_message"])
 
     # STREAM evaluation result
     evaluation_metadata = {
@@ -72,7 +73,8 @@ def seed_simulate_attack(defense: DefenseAgent, attack: JailBreakAgent, attack_p
             "success": status,
             "status": "jailbroken" if status else "blocked",
             "attack_prompt": schema["prompt"],
-            "defense_response": schema["defense_message"]
+            "defense_response": schema["defense_message"],
+            "improvement_suggestion": improvement_suggestion if status else ""
         }
     }
     yield evaluation_metadata
@@ -124,7 +126,7 @@ def start_simulation(iterations, attack_objective, defense_system_prompt, initia
     metadata = {"state": "generating", "conversation_history": conversation_history}
     yield metadata
 
-    state = attack_agent.evaluate_broken(defense_message)
+    state, improvement_suggestion = attack_agent.evaluate_broken_with_suggestions(defense_message)
 
     # STREAM evaluation result
     evaluation_metadata = {
@@ -134,7 +136,8 @@ def start_simulation(iterations, attack_objective, defense_system_prompt, initia
             "success": state,
             "status": "jailbroken" if state else "blocked",
             "attack_prompt": initial_attack_prompt,
-            "defense_response": defense_message
+            "defense_response": defense_message,
+            "improvement_suggestion": improvement_suggestion if state else ""
         }
     }
     yield evaluation_metadata

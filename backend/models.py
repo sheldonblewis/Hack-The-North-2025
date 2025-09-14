@@ -34,6 +34,7 @@ class AttackAttemptModel:
     response_time: Optional[int] = None
     timestamp: Optional[datetime] = None
     evaluation_result: Optional[bool] = None
+    improvement_suggestion: Optional[str] = None  # AI-generated suggestion when jailbreak succeeds
     _id: Optional[ObjectId] = None
 
     def to_dict(self):

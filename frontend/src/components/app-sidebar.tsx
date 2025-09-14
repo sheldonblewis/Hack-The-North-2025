@@ -117,11 +117,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       //   url: "/test-api",
       //   icon: IconShield,
       // },
-      // {
-      //   title: "Analytics",
-      //   url: `/agents/${selectedAgent?.id}/analytics`,
-      //   icon: IconChartAreaLine,
-      // },
+      {
+        title: "Analytics",
+        url: `/agents/${selectedAgent?.id}/analytics`,
+        icon: IconChartAreaLine,
+      },
       // {
       //   title: "Alerts",
       //   url: `/agents/${selectedAgent?.id}/alerts`,
