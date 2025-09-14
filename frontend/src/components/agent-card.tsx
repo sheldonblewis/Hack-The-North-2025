@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Button } from "~/components/ui/button";
 import { Bot, ArrowRight, Circle } from "lucide-react";
 import type { Agent } from "~/types/agent";
+import { cn } from "~/lib/utils";
 
 interface AgentCardProps {
   agent: Agent;
@@ -11,10 +12,16 @@ interface AgentCardProps {
 
 export function AgentCard({ agent, showActions = true }: AgentCardProps) {
   return (
-    <Card className="group border-border bg-card hover:bg-accent/5 transition-colors duration-200 h-full flex flex-col">
+    <Card
+      className={cn(
+        "border-border bg-card transition-colors duration-200 flex flex-col",
+        showActions && "group hover:bg-accent/5"
+      )}
+    >
       <CardHeader className="pb-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {/* content */}
             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
               <Bot className="h-4 w-4 text-muted-foreground" />
             </div>
