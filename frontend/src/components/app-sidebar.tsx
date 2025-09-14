@@ -96,24 +96,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     navMain: [
       {
+        title: "Dashboard",
+        url: `/agents/${selectedAgent?.id}`,
+        icon: IconHome,
+      },
+      {
         title: "Test Runs",
         url: `/agents/${selectedAgent?.id}/runs`,
         icon: IconRobot,
       },
       {
-        title: "Metrics Dashboard",
-        url: `/agents/${selectedAgent?.id}`,
-        icon: IconHome,
-      },
-      {
         title: "Chat",
         url: `/agents/${selectedAgent?.id}/chat`,
         icon: IconMessageCircle,
-      },
-      {
-        title: "Runs",
-        url: `/agents/${selectedAgent?.id}/runs`,
-        icon: IconRobot,
       },
       {
         title: "Red Team Testing",
