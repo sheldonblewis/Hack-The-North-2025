@@ -2,24 +2,41 @@
 
 import * as React from "react"
 import { usePathname } from "next/navigation"
-
-interface Agent {
-  id: string
-  name: string
-}
-
-interface AgentContextType {
-  selectedAgent: Agent | null
-  setSelectedAgent: (agent: Agent | null) => void
-  agents: Agent[]
-}
+import type { Agent, AgentContextType } from "~/types/agent"
 
 const AgentContext = React.createContext<AgentContextType | undefined>(undefined)
 
 const defaultAgents: Agent[] = [
-  { id: "1", name: "Agent 01" },
-  { id: "2", name: "Agent 02" },
-  { id: "3", name: "Agent 03" },
+  {
+    id: "1",
+    name: "Agent 01",
+    description: "Customer service and support automation with advanced conversation handling",
+    category: "Support",
+    status: "Active",
+    lastTested: "2 hours ago",
+    isActive: true,
+    prompt: "fefe"
+  },
+  {
+    id: "2", 
+    name: "Agent 02",
+    description: "Sales outreach and lead qualification with personalized messaging",
+    category: "Sales",
+    status: "Active",
+    lastTested: "4 hours ago", 
+    isActive: true,
+    prompt: "fefe"
+  },
+  {
+    id: "3",
+    name: "Agent 03",
+    description: "Meeting coordination and calendar management with smart scheduling",
+    category: "Productivity",
+    status: "In Testing",
+    lastTested: "1 day ago",
+    isActive: false,
+    prompt: "fefe"
+  }
 ]
 
 export function AgentProvider({ children }: { children: React.ReactNode }) {
