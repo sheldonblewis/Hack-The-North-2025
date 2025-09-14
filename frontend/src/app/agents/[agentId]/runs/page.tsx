@@ -14,18 +14,18 @@ export default function AgentRuns({
       {/* Status Cards Row */}
       <div className="flex flex-wrap gap-6">
         {/* Status Card */}
-        <Card className="max-w-80 backdrop-blur overflow-hidden py-0 pt-6">
+        <Card className="max-w-80 backdrop-blur overflow-hidden py-0 pt-5">
           <CardContent className="p-0 py-0 flex flex-col h-full">
-            <div className="flex items-center gap-2 mb-4 px-6">
+            <div className="flex items-center gap-1 mb-4 px-6">
               <div className="inline-flex items-center gap-2 bg-green-100/80 text-black px-3 py-1 rounded-full text-sm font-medium">
                 <CheckCircle className="h-4 w-4" />
                 Active
               </div>
             </div>
-            <h2 className="text-xl font-semibold mb-2 px-6">
+            <h2 className="text-lg font-semibold mb-2 px-6">
               Your agent is ready to run
             </h2>
-            <p className=" mb-6 px-6 te">
+            <p className=" mb-6 px-6 text-sm text-muted-foreground">
               Your last test run was recent and the models haven't changed.
             </p>
             
