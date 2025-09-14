@@ -16,23 +16,23 @@ export default async function AgentRuns({
       {/* Status Cards Row */}
       <div className="flex flex-wrap gap-6">
         {/* Status Card */}
-        <Card className="max-w-80 backdrop-blur overflow-hidden py-0 pt-5">
+        <Card className="max-w-72 backdrop-blur overflow-hidden py-0 pt-5 ">
           <CardContent className="p-0 py-0 flex flex-col h-full">
-            <div className="flex items-center gap-1 mb-4 px-6">
+            <div className="flex items-center gap-1 mb-4 px-4">
               <div className="inline-flex items-center gap-2 bg-green-100/80 text-black px-3 py-1 rounded-full text-sm font-medium">
                 <CheckCircle className="h-4 w-4" />
                 Active
               </div>
             </div>
-            <h2 className="text-lg font-semibold mb-2 px-6">
+            <h2 className="text-lg font-semibold mb-2 px-4">
               Your agent is ready to run
             </h2>
-            <p className=" mb-6 px-6 text-sm text-muted-foreground">
+            <p className=" mb-6 px-4 text-sm text-muted-foreground">
               Your last test run was recent and the models haven't changed.
             </p>
             
             <div className="space-y-3 bg-green-100/80 px-6 flex-1 flex flex-col py-6 text-sm">
-              <div className="flex justify-between items-center">
+              {/* <div className="flex justify-between items-center">
                 <span className="text-gray-500">Status:</span>
                 <span className="font-medium text-gray-900">All Systems Go</span>
               </div>
@@ -42,7 +42,7 @@ export default async function AgentRuns({
               </div>
               {/* <Button variant="outline" className="w-full mt-auto justify-start text-black">
                 View Test Results
-              </Button> */}
+              </Button> */} 
             </div>
           </CardContent>
         </Card>
@@ -59,32 +59,32 @@ export default async function AgentRuns({
             
             <div className="grid grid-cols-3 gap-2">
               <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative">
-                <OctagonX className="absolute -top-1 -right-1 h-4 w-4 text-red-500 drop-shadow-lg animate-pulse" title="High Urgency" />
+                {/* <OctagonX className="absolute -top-1 -right-1 h-4 w-4 text-red-500 drop-shadow-lg animate-pulse" title="High Urgency" /> */}
                 <span className="font-medium text-xs leading-tight">Jailbreak</span>
                 <span className="text-xs text-muted-foreground leading-tight">Bypass AI safeguards</span>
               </Button>
               <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
-                <TriangleAlert className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 drop-shadow-lg" title="Medium Urgency" />
+                {/* <TriangleAlert className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 drop-shadow-lg" title="Medium Urgency" /> */}
                 <span className="font-medium text-xs ">Base64</span>
                 <span className="text-xs text-muted-foreground">Binary data encoding</span>
               </Button>
               <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
-                <Info className="absolute -top-1 -right-1 h-4 w-4 text-green-500 drop-shadow-lg" title="Low Urgency" />
+                {/* <Info className="absolute -top-1 -right-1 h-4 w-4 text-green-500 drop-shadow-lg" title="Low Urgency" /> */}
                 <span className="font-medium text-xs">Caesar</span>
                 <span className="text-xs text-muted-foreground">Character shift cipher</span>
               </Button>
               <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
-                <OctagonX className="absolute -top-1 -right-1 h-4 w-4 text-red-500 drop-shadow-lg animate-pulse" title="High Urgency" />
+                {/* <OctagonX className="absolute -top-1 -right-1 h-4 w-4 text-red-500 drop-shadow-lg animate-pulse" title="High Urgency" /> */}
                 <span className="font-medium text-xs">UnicodeConfusable</span>
                 <span className="text-xs text-muted-foreground">Similar-looking characters</span>
               </Button>
               <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
-                <TriangleAlert className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 drop-shadow-lg" title="Medium Urgency" />
+                {/* <TriangleAlert className="absolute -top-1 -right-1 h-4 w-4 text-yellow-500 drop-shadow-lg" title="Medium Urgency" /> */}
                 <span className="font-medium text-xs">ROT13</span>
                 <span className="text-xs text-muted-foreground">13-position substitution</span>
               </Button>
               <Button variant="outline" size="sm" className="h-auto p-3 py-2 text-left justify-start flex-col items-start relative leading-tight">
-                <Info className="absolute -top-1 -right-1 h-4 w-4 text-green-500 drop-shadow-lg" title="Low Urgency" />
+                {/* <Info className="absolute -top-1 -right-1 h-4 w-4 text-green-500 drop-shadow-lg" title="Low Urgency" /> */}
                 <span className="font-medium text-xs">Comprehensive</span>
                 <span className="text-xs text-muted-foreground">Run all security tests</span>
               </Button>

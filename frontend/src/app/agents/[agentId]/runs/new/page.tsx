@@ -35,7 +35,7 @@ export default function NewRun({
   const [customAttack, setCustomAttack] = useState("");
   const [selectedAttacks, setSelectedAttacks] = useState<string[]>([]);
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
-  const [iterations, setIterations] = useState([100]);
+  const [iterations, setIterations] = useState([5]);
   const [timeout, setTimeout] = useState(30);
   const [concurrency, setConcurrency] = useState(5);
   const [customPrompts, setCustomPrompts] = useState("");

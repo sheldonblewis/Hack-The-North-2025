@@ -54,7 +54,7 @@ export function AgentCard({ agent, showActions = true }: AgentCardProps) {
         
         {showActions && (
           <div className="flex gap-2 pt-2 mt-auto">
-            <Link href={`/agents/${agent.id}`} className="flex-1">
+            <Link href={`/agents/${agent.id}/runs`} className="flex-1">
               <Button 
                 variant="outline" 
                 size="sm" 

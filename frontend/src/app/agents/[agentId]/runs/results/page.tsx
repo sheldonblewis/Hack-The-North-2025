@@ -7,10 +7,12 @@ import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Progress } from "~/components/ui/progress";
-import { ArrowLeft, Play, Square, AlertTriangle, CheckCircle, XCircle, Bot, Shield, Clock, Activity } from "lucide-react";
+import { ArrowLeft, Play, Square, AlertTriangle, CheckCircle, XCircle, Bot, Shield, Clock, Activity, ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { useAgent } from "~/contexts/agent-context";
 import { AgentCard } from "~/components/agent-card";
 import { apiClient } from "~/lib/api";
+import { cn } from "~/lib/utils";
+import { Label } from "~/components/ui/label";
 import {
   ChatMessage,
   StreamingData,
@@ -46,6 +48,7 @@ export default function SimulationResults({
   });
   const [progress, setProgress] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const hasStartedRef = useRef(false);
 
   // Get simulation config from URL params
   const configParam = searchParams?.get('config');
@@ -85,6 +88,7 @@ export default function SimulationResults({
         initial_attack_prompt: config.initial_attack_prompt,
         defense_system_prompt: config.defense_system_prompt
       });
+      console.log(config)
 
       for await (const data of streamGenerator) {
         // Add to streaming data log for debugging
@@ -100,9 +104,10 @@ export default function SimulationResults({
           setProgress(progressPercent);
         }
 
-        // Update conversation history
-        if (data.data?.conversation_history && Array.isArray(data.data.conversation_history) && data.data.conversation_history.length > 0) {
-          const newConversationHistory = data.data.conversation_history;
+        // Update conversation history (handle both spelling variants from API)
+        const conversationData = data.data?.conversation_history || data.data?.convesation_history;
+        if (conversationData && Array.isArray(conversationData) && conversationData.length > 0) {
+          const newConversationHistory = conversationData;
           setConversationHistory(newConversationHistory);
 
           // Transform messages using current evaluation results
@@ -115,6 +120,10 @@ export default function SimulationResults({
             setStats(calculateStats(chatMessages));
             return currentEvaluationResults;
           });
+
+          // Debug logging
+          console.log('Updated conversation history:', newConversationHistory);
+          console.log('Current messages:', messages);
         }
 
         // Handle evaluation results
@@ -140,7 +149,7 @@ export default function SimulationResults({
         }
 
         // Handle completion or auto-complete based on iterations
-        if (data.type === 'complete' || (config.iterations && stats.totalExchanges >= config.iterations)) {
+        if (data.type === 'complete') {
           setProgress(100);
           break;
         }
@@ -162,7 +171,8 @@ export default function SimulationResults({
 
   // Auto-start simulation on page load
   useEffect(() => {
-    if (config && selectedAgent && !isSimulating) {
+    if (config && selectedAgent && !hasStartedRef.current) {
+      hasStartedRef.current = true;
       runStreamingSimulation();
     }
   }, [config, selectedAgent]);
@@ -197,34 +207,54 @@ export default function SimulationResults({
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
-        </Button>
+      {isSimulating && (
         <div className="flex items-center space-x-2">
-          {isSimulating && (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-              <span className="text-sm text-gray-600">Running simulation...</span>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setIsSimulating(false)}
-                className="ml-4"
-              >
-                <Square className="h-4 w-4 mr-2" />
-                Stop
-              </Button>
-            </>
-          )}
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+          <span className="text-sm text-gray-600">Running simulation...</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setIsSimulating(false);
+              setError('Simulation stopped by user');
+            }}
+            className="ml-4"
+          >
+            <Square className="h-4 w-4 mr-2" />
+            Stop
+          </Button>
         </div>
-      </div>
-
-      {/* Agent Card */}
-      {selectedAgent && (
-        <AgentCard agent={selectedAgent} showActions={false} />
       )}
+
+
+      {/* Success Rate & Agent Card */}
+      <div className="flex gap-6">
+        {/* Success Rate Card */}
+        <Card className="min-h-full min-w-1/6 flex items-center justify-center">
+          <CardContent className="p-4 text-center">
+            <div className="space-y-2">
+              <div className="text-3xl font-bold ">
+                {Math.round(stats.successRate)}%
+              </div>
+              <div className="text-xs text-muted-foreground font-medium">
+                Success Rate
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {stats.totalExchanges - stats.successfulJailbreaks}/{stats.totalExchanges}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        
+
+        {/* Agent Card */}
+        {selectedAgent && (
+          <div className="w-full">
+            <AgentCard agent={selectedAgent} showActions={false} />
+          </div>
+        )}
+      </div>
 
       {/* Test Info */}
       <Card>
@@ -260,7 +290,7 @@ export default function SimulationResults({
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold">{stats.totalExchanges}</div>
                 <div className="text-sm text-gray-600">Total Exchanges</div>
@@ -272,10 +302,6 @@ export default function SimulationResults({
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">{stats.totalExchanges - stats.successfulJailbreaks}</div>
                 <div className="text-sm text-gray-600">Blocked</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">{Math.round(stats.successRate)}%</div>
-                <div className="text-sm text-gray-600">Success Rate</div>
               </div>
             </div>
           </div>
@@ -298,26 +324,13 @@ export default function SimulationResults({
       )}
 
       {/* Chat Interface */}
+      
       {messages.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Live Conversation</span>
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-3 px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-risk-critical, #ef4444)15', border: '2px solid var(--color-risk-critical, #ef4444)30' }}>
-                  <Bot className="h-5 w-5" style={{ color: 'var(--color-risk-critical, #ef4444)' }} />
-                  <span className="font-semibold text-sm">Attack Agent</span>
-                </div>
-                <div className="text-gray-400 font-bold text-lg">vs</div>
-                <div className="flex items-center gap-3 px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-accent-cyan, #06b6d4)15', border: '2px solid var(--color-accent-cyan, #06b6d4)30' }}>
-                  <Shield className="h-5 w-5" style={{ color: 'var(--color-accent-cyan, #06b6d4)' }} />
-                  <span className="font-semibold text-sm">Defense Agent</span>
-                </div>
-              </div>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6 max-h-96 overflow-y-auto">
+        <div className="space-y-2">
+        <Label htmlFor="testName">Live Results</Label>
+        <Card className="py-0">
+          <CardContent className="py-5 pb-0 px-1">
+            <div className="space-y-6 max-h-screen overflow-y-auto px-5">
               <AnimatePresence>
                 {messages.map((message, index) => (
                   <motion.div
@@ -325,100 +338,89 @@ export default function SimulationResults({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className={`flex ${message.role === 'defender' ? 'justify-end' : 'justify-start'}`}
+                    className={cn(
+                      "flex",
+                      message.role === 'defender' ? 'justify-end' : 'justify-start'
+                    )}
                   >
-                    <div className={`max-w-[75%] ${message.role === 'defender' ? 'order-2' : 'order-1'}`}>
+                    <div className={cn(
+                      "max-w-[75%]",
+                      message.role === 'defender' ? 'order-2' : 'order-1'
+                    )}>
                       {/* Agent Avatar & Name */}
-                      <div className={`flex items-center gap-3 mb-3 ${
+                      <div className={cn(
+                        "flex items-center gap-3 mb-1 ml-1",
                         message.role === 'defender' ? 'justify-end' : 'justify-start'
-                      }`}>
-                        {message.role === 'attacker' && <Bot className="h-4 w-4" style={{ color: 'var(--color-risk-critical, #ef4444)' }} />}
-                        <span className={`text-sm font-semibold ${
-                          message.role === 'attacker' ? 'text-red-600' : 'text-blue-600'
-                        }`}>
+                      )}>
+                        <span className={cn(
+                          "text-xs font-light",
+                          message.role === 'attacker' ? 'text-primary' : 'text-primary'
+                        )}>
                           {message.role === 'attacker' ? 'Attack Agent' : 'Defense Agent'}
                         </span>
-                        {message.role === 'defender' && <Shield className="h-4 w-4" style={{ color: 'var(--color-accent-cyan, #06b6d4)' }} />}
                       </div>
 
                       {/* Message Bubble */}
-                      <div className={`relative rounded-2xl px-4 py-3 shadow-sm`}
-                        style={{
-                          backgroundColor: message.role === 'attacker'
-                            ? 'var(--color-risk-critical, #ef4444)15'
-                            : 'var(--color-accent-cyan, #06b6d4)15',
-                          border: message.role === 'attacker'
-                            ? '1px solid var(--color-risk-critical, #ef4444)30'
-                            : '1px solid var(--color-accent-cyan, #06b6d4)30'
-                        }}>
-                        {/* Flag Indicator */}
-                        {message.flag && (
-                          <div className="absolute -left-2 top-2">
-                            <div className="rounded-full p-1" style={getFlagColor(message.flag.severity)}>
-                              <AlertTriangle className="h-3 w-3" />
-                            </div>
-                          </div>
-                        )}
+                      <div className={cn(
+                        "relative rounded-2xl px-4 py-3 shadow-sm border",
+                        message.role === 'attacker'
+                          ? 'bg-destructive/5 border-destructive/20 rounded-bl-none'
+                          : 'bg-cyan-50 border-cyan-200 dark:bg-cyan-950/50 dark:border-cyan-800'
+                      )}>
+
 
                         {/* Jailbreak Detection Banner */}
                         {message.role === 'attacker' && message.status === 'success' && (
-                          <div className="mb-3 p-2 rounded-lg" style={{
-                            backgroundColor: 'var(--color-risk-critical, #ef4444)25',
-                            border: '2px solid var(--color-risk-critical, #ef4444)'
-                          }}>
+                          <div className="mb-3 p-3 rounded-lg bg-destructive/10 border-2 border-destructive">
                             <div className="flex items-center gap-2">
-                              <AlertTriangle className="h-4 w-4" style={{ color: 'var(--color-risk-critical, #ef4444)' }} />
-                              <span className="text-xs font-bold" style={{ color: 'var(--color-risk-critical, #ef4444)' }}>
+                              <AlertTriangle className="h-4 w-4 text-destructive" />
+                              <span className="text-xs font-bold text-destructive">
                                 🚨 JAILBREAK DETECTED
                               </span>
                             </div>
-                            <div className="text-xs mt-1" style={{ color: 'var(--color-risk-critical, #ef4444)' }}>
+                            <div className="text-xs mt-1 text-destructive">
                               This attack successfully bypassed the defense system
                             </div>
                           </div>
                         )}
 
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap text-foreground">{message.content}</p>
 
                         {/* Message Footer */}
-                        <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+                        <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
                             {formatTime(message.timestamp)}
                           </div>
 
                           {message.status && (
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium`}
-                              style={{
-                                backgroundColor: message.role === 'attacker' ? (
-                                  message.status === 'success' ? 'var(--color-risk-critical, #ef4444)20' :
-                                  'var(--color-accent-emerald, #10b981)20'
-                                ) : (
-                                  message.status === 'success' ? 'var(--color-accent-emerald, #10b981)20' :
-                                  'var(--color-risk-critical, #ef4444)20'
-                                ),
-                                color: message.role === 'attacker' ? (
-                                  message.status === 'success' ? 'var(--color-risk-critical, #ef4444)' :
-                                  'var(--color-accent-emerald, #10b981)'
-                                ) : (
-                                  message.status === 'success' ? 'var(--color-accent-emerald, #10b981)' :
-                                  'var(--color-risk-critical, #ef4444)'
-                                )
-                              }}>
+                            <Badge
+                              variant="outline"
+                              className={cn(
+                                "text-xs font-medium",
+                                message.role === 'attacker'
+                                  ? message.status === 'success'
+                                    ? 'bg-destructive/10 text-destructive border-destructive/20'
+                                    : 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border-green-800'
+                                  : message.status === 'success'
+                                    ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/50 dark:text-green-400 dark:border-green-800'
+                                    : 'bg-destructive/10 text-destructive border-destructive/20'
+                              )}
+                            >
                               {message.role === 'attacker' ? (
                                 message.status === 'success' ? '🚨 JAILBROKEN' : '🛡️ BLOCKED'
                               ) : (
                                 message.status === 'success' ? '✅ DEFENDED' : '❌ COMPROMISED'
                               )}
-                            </span>
+                            </Badge>
                           )}
                         </div>
 
                         {/* Flag Details */}
                         {message.flag && (
-                          <div className="mt-2 pt-2 border-t border-gray-200">
-                            <div className="text-xs text-gray-600 leading-relaxed">
-                              <span className="font-semibold">⚠️ Flag:</span> {message.flag.description}
+                          <div className="mt-2 pt-2 border-t border-border">
+                            <div className="text-xs text-muted-foreground leading-relaxed">
+                              <span className="font-semibold">⚠️ :</span> {message.flag.description}
                             </div>
                           </div>
                         )}
@@ -431,6 +433,7 @@ export default function SimulationResults({
             </div>
           </CardContent>
         </Card>
+        </div>
       )}
     </div>
   );
