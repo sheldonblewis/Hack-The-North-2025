@@ -24,13 +24,12 @@ export function NavMain({
   const { selectedAgent } = useAgent()
   const pathname = usePathname()
   
-  // Don't render anything if no agent is selected
   if (!selectedAgent) {
     return null
   }
   
   return (
-    <SidebarGroup>
+    <SidebarGroup className="px-0">
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {

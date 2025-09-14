@@ -34,18 +34,18 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <AgentProvider>
       <SidebarProvider
+        defaultOpen={true}
         style={
           {
-            "--sidebar-width": "calc(var(--spacing) * 85)",
             "--header-height": "calc(var(--spacing) * 12)",
           } as React.CSSProperties
         }
       >
         <AppSidebar variant="inset" />
         <SidebarInset>
-          <div className="flex flex-1 flex-col justify-center overflow-hidden">
-            <div className="@container/main flex flex-col gap-2 py-4 md:py-32 px-4 lg:px-6 mx-auto max-w-5/6 w-6xl">
-              <h1 className="text-5xl tracking-tight mb-3 border-b pb-2">
+          <div className="flex flex-1 flex-col justify-center">
+            <div className="@container/main flex flex-col gap-2 pt-16 min-h-[95%] mx-auto max-w-[70rem] w-[90%] ">
+              <h1 className="text-5xl tracking-tight mb-3 border-b pb-4">
                 {getRouteName()}
               </h1>
               {children}
