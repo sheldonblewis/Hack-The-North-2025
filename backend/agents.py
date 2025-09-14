@@ -198,7 +198,7 @@ Use these brainstormed ideas to refine the previous prompt. Only return back the
 class DefenseAgent:
     # knowledge_base: str # chroma_db directory
     system_prompt: str
-    model: str = "llama3.1-8b"
+    # model: str = "llama3.1-8b"
 
     def __post_init__(self):
         # Initialize instance variables (not class variables)
@@ -206,5 +206,6 @@ class DefenseAgent:
     
 
     def ask(self, attack_message):
-        output = llms.cerebras_stream_chat(prompt = attack_message, system_prompt=self.system_prompt, model_name=self.model)
+        # output = llms.cerebras_stream_chat(prompt = attack_message, system_prompt=self.system_prompt, model_name=self.model)
+        output = llms.cohere_stream_chat(prompt=attack_message, system_prompt=self.system_prompt)
         return output
