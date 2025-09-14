@@ -57,11 +57,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     navMain: selectedAgent ? [
       {
-        title: "Runs",
-        url: `/agents/${selectedAgent.id}/runs`,
-        icon: IconRobot,
-      },
-      {
         title: "Metrics Dashboard",
         url: `/agents/${selectedAgent.id}`,
         icon: IconHome,
