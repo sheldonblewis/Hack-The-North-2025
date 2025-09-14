@@ -44,7 +44,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <AppSidebar variant="inset" />
         <SidebarInset>
           <div className="flex flex-1 flex-col justify-center">
-            <div className="@container/main flex flex-col gap-2 pt-16 min-h-[95%] mx-auto max-w-[70rem] w-[90%] ">
+            <div className="@container/main flex flex-col gap-2 py-16 min-h-[95%] mx-auto max-w-[70rem] w-[90%] ">
               <h1 className="text-5xl tracking-tight mb-3 border-b pb-4">
                 {getRouteName()}
               </h1>
