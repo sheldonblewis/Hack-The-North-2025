@@ -61,12 +61,12 @@ def seed_simulate_attack(defense: DefenseAgent, attack: JailBreakAgent, attack_p
         return False
 
 
-def start_simulation(iterations, attack_objective, defense_system_prompt):
+def start_simulation(iterations:int, attack_objective:str, defense_system_prompt:str, defense_model:str="cohere"):
 
     conversation_history = []
     # chat_message = {"role": "defense", "message": chat}
     
-    defense_agent = DefenseAgent(system_prompt=defense_system_prompt)
+    defense_agent = DefenseAgent(system_prompt=defense_system_prompt, model=defense_model)
     attack_agent = JailBreakAgent(objective=attack_objective)
 
     # First try seed prompts to see if it works:
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     data_list = []
     
     try:
-        for metadata in start_simulation(iterations=8, attack_objective=objective, defense_system_prompt=defense_system_prompt):
+        for metadata in start_simulation(iterations=8, attack_objective=objective, defense_system_prompt=defense_system_prompt, defense_model="cohere"):
             data_list.append(metadata)
             pass
     except StopIteration as e:
