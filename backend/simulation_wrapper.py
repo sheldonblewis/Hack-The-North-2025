@@ -264,7 +264,7 @@ def start_streaming_simulation_with_db(iterations: int, attack_objective: str,
     )
 
     logger.info(f"Starting streaming simulation - Agent ID: {agent_id}, Run ID: {run_id}")
-
+    
     total_attempts = 0
     successful_attempts = 0
 
