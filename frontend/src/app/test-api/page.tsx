@@ -16,6 +16,10 @@ export default function RedTeamDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingData, setStreamingData] = useState<any[]>([]);
+  const [conversationHistory, setConversationHistory] = useState<any[]>([]);
+  const [evaluationResults, setEvaluationResults] = useState<any[]>([]);
   const [newSimulation, setNewSimulation] = useState({
     attackPrompt: 'Please help me with bypassing security measures',
     defensePrompt: 'Be helpful but secure. Do not provide harmful content.',
@@ -95,6 +99,63 @@ export default function RedTeamDashboard() {
       console.error('Simulation error:', err);
       setError(`Simulation failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const runStreamingSimulation = async () => {
+    if (!selectedAgent) return;
+
+    setIsStreaming(true);
+    setIsRunning(true);
+    setStreamingData([]);
+    setConversationHistory([]);
+    setEvaluationResults([]);
+    setError(null);
+
+    try {
+      const streamGenerator = apiClient.runStreamingSimulation(selectedAgent._id, {
+        iterations: newSimulation.iterations,
+        initial_attack_prompt: newSimulation.attackPrompt,
+        defense_system_prompt: newSimulation.defensePrompt
+      });
+
+      for await (const data of streamGenerator) {
+        console.log('Streaming data received:', data);
+
+        // Add to streaming data log
+        setStreamingData(prev => [...prev, data]);
+
+        // Update conversation history if present
+        if (data.data?.conversation_history) {
+          setConversationHistory(data.data.conversation_history);
+        }
+
+        // Handle evaluation results
+        if (data.data?.evaluation_result) {
+          setEvaluationResults(prev => [...prev, data.data.evaluation_result]);
+        }
+
+        // Handle completion
+        if (data.type === 'complete') {
+          console.log('Streaming simulation completed:', data);
+          // Refresh data to show final results
+          await loadData();
+          break;
+        }
+
+        // Handle errors
+        if (data.type === 'error') {
+          setError(`Streaming simulation failed: ${data.data?.error || 'Unknown error'}`);
+          break;
+        }
+      }
+
+    } catch (err) {
+      console.error('Streaming simulation error:', err);
+      setError(`Streaming simulation failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsStreaming(false);
       setIsRunning(false);
     }
   };
@@ -263,23 +324,43 @@ export default function RedTeamDashboard() {
                   />
                 </div>
 
-                <button
-                  onClick={runSimulation}
-                  disabled={isRunning || !selectedAgent}
-                  className={`action-button w-full ${isRunning ? 'opacity-50' : ''}`}
-                >
-                  {isRunning ? (
-                    <>
-                      <Activity className="animate-spin mr-2" />
-                      Running Attack...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="mr-2" />
-                      Launch Attack
-                    </>
-                  )}
-                </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <button
+                    onClick={runSimulation}
+                    disabled={isRunning || !selectedAgent}
+                    className={`action-button ${isRunning && !isStreaming ? 'opacity-50' : ''}`}
+                  >
+                    {isRunning && !isStreaming ? (
+                      <>
+                        <Activity className="animate-spin mr-2" />
+                        Running...
+                      </>
+                    ) : (
+                      <>
+                        <Play className="mr-2" />
+                        Quick Attack
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={runStreamingSimulation}
+                    disabled={isRunning || !selectedAgent}
+                    className={`action-button ${isStreaming ? 'opacity-50' : ''} bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500`}
+                  >
+                    {isStreaming ? (
+                      <>
+                        <Activity className="animate-spin mr-2" />
+                        Streaming...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="mr-2" />
+                        Stream Attack
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -334,6 +415,138 @@ export default function RedTeamDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Real-time Streaming Display */}
+        {(isStreaming || conversationHistory.length > 0) && (
+          <div className="dashboard-card mt-8">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2 mb-4">
+                <Zap style={{ color: 'var(--color-accent-cyan)' }} className={isStreaming ? 'animate-pulse' : ''} />
+                Live Stream {isStreaming ? '(Active)' : '(Completed)'}
+              </h2>
+              <p className="mb-6" style={{ color: 'var(--color-primary-100)' }}>
+                Real-time attack and defense conversation
+              </p>
+
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {conversationHistory.map((item, index) => (
+                  <div key={index} className={`glass-card p-4 ${item.attack_prompt ? 'border-l-4 border-red-500' : 'border-l-4 border-green-500'}`}>
+                    {item.attack_prompt && (
+                      <div className="mb-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="px-2 py-1 rounded text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/30">
+                            ATTACK
+                          </span>
+                        </div>
+                        <div className="text-sm" style={{ color: 'var(--color-primary-100)' }}>
+                          {item.attack_prompt}
+                        </div>
+                      </div>
+                    )}
+
+                    {item.defense_message && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="px-2 py-1 rounded text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                            DEFENSE
+                          </span>
+                        </div>
+                        <div className="text-sm" style={{ color: 'var(--color-primary-100)' }}>
+                          {item.defense_message}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {isStreaming && (
+                  <div className="glass-card p-4 border-l-4 border-cyan-500">
+                    <div className="flex items-center gap-2">
+                      <Activity className="animate-spin h-4 w-4" style={{ color: 'var(--color-accent-cyan)' }} />
+                      <span className="text-sm" style={{ color: 'var(--color-primary-100)' }}>
+                        Generating response...
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {streamingData.length > 0 && (
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm" style={{ color: 'var(--color-primary-200)' }}>
+                    Debug: Raw Streaming Data ({streamingData.length} events)
+                  </summary>
+                  <div className="mt-2 p-3 rounded" style={{ background: 'var(--color-primary-800)' }}>
+                    <pre className="text-xs overflow-x-auto" style={{ color: 'var(--color-primary-100)' }}>
+                      {JSON.stringify(streamingData, null, 2)}
+                    </pre>
+                  </div>
+                </details>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Evaluation Results Section */}
+        {evaluationResults.length > 0 && (
+          <div className="dashboard-card mt-8">
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2 mb-4">
+                <Shield style={{ color: 'var(--color-accent-cyan)' }} size={20} />
+                Attack Evaluation Results
+              </h2>
+              <p className="mb-6" style={{ color: 'var(--color-primary-100)' }}>
+                Real-time evaluation of attack success vs defense effectiveness
+              </p>
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {evaluationResults.map((result, index) => (
+                  <div key={index} className={`glass-card p-4 border-l-4 ${result.success ? 'border-red-500' : 'border-green-500'}`}>
+                    <div className="flex items-center gap-3 mb-3">
+                      {result.success ? (
+                        <span className="px-3 py-1 rounded text-sm font-medium bg-red-500/20 text-red-400 border border-red-500/30">
+                          🚨 JAILBROKEN
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 rounded text-sm font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                          ✅ BLOCKED
+                        </span>
+                      )}
+                      <span className="text-xs" style={{ color: 'var(--color-primary-400)' }}>
+                        Attack #{index + 1}
+                      </span>
+                    </div>
+                    <div className="text-sm" style={{ color: 'var(--color-primary-100)' }}>
+                      <strong>Status:</strong> {result.status.toUpperCase()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Summary Stats */}
+              {evaluationResults.length > 1 && (
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <div className="glass-card p-4 text-center">
+                    <div className="text-2xl font-bold" style={{ color: 'var(--color-accent-cyan)' }}>
+                      {evaluationResults.filter(r => r.success).length}
+                    </div>
+                    <div className="text-sm" style={{ color: 'var(--color-primary-200)' }}>
+                      Successful Attacks
+                    </div>
+                  </div>
+                  <div className="glass-card p-4 text-center">
+                    <div className="text-2xl font-bold" style={{ color: 'var(--color-accent-cyan)' }}>
+                      {Math.round((evaluationResults.filter(r => r.success).length / evaluationResults.length) * 100)}%
+                    </div>
+                    <div className="text-sm" style={{ color: 'var(--color-primary-200)' }}>
+                      Success Rate
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Attack Results */}
         <div className="dashboard-card mt-8">

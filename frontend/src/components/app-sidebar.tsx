@@ -145,9 +145,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="pb-4 pt-8 px-0">
         <div className="flex items-baseline ">
           <a href="/">
-            <span className="text-5xl font-black font-stretch-150%">IN-IT</span>
+            <span className="text-5xl font-black inline-block" style={{ transform: "scaleX(1.45)", transformOrigin: "left center" }}>IN-IT</span>
           </a>
-          <span className="text-sm tabular-nums slashed-zero text-muted-foreground">
+          <span className="ml-12 text-sm tabular-nums slashed-zero text-muted-foreground">
             {currentTime}
           </span>
         </div>
