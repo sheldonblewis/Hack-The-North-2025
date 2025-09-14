@@ -6,12 +6,13 @@ import type { Agent } from "~/types/agent";
 
 interface AgentCardProps {
   agent: Agent;
+  showActions?: boolean;
 }
 
-export function AgentCard({ agent }: AgentCardProps) {
+export function AgentCard({ agent, showActions = true }: AgentCardProps) {
   return (
     <Card className="group border-border bg-card hover:bg-accent/5 transition-colors duration-200 h-full flex flex-col">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
@@ -40,30 +41,32 @@ export function AgentCard({ agent }: AgentCardProps) {
           {agent.description}
         </CardDescription>
         
-        <div className="text-xs text-muted-foreground flex-1">
+        <div className={`text-xs text-muted-foreground ${showActions ? 'flex-1' : ''}`}>
           Last tested: {agent.lastTested}
         </div>
         
-        <div className="flex gap-2 pt-2 mt-auto">
-          <Link href={`/agents/${agent.id}`} className="flex-1">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="w-full border-border hover:bg-accent cursor-pointer hover:text-accent-foreground"
-            >
-              View
-            </Button>
-          </Link>
-          <Link href={`/agents/${agent.id}/runs/new`}>
-            <Button 
-              size="sm" 
-              className="bg-red-600 hover:bg-red-700 text-white border-0"
-            >
-              Test
-              <ArrowRight className="h-3 w-3 ml-1" />
-            </Button>
-          </Link>
-        </div>
+        {showActions && (
+          <div className="flex gap-2 pt-2 mt-auto">
+            <Link href={`/agents/${agent.id}`} className="flex-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full border-border hover:bg-accent cursor-pointer hover:text-accent-foreground"
+              >
+                View
+              </Button>
+            </Link>
+            <Link href={`/agents/${agent.id}/runs/new`}>
+              <Button 
+                size="sm" 
+                className="bg-red-600 hover:bg-red-700 text-white border-0"
+              >
+                Test
+                <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </Link>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

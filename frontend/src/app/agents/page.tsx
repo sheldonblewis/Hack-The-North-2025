@@ -37,7 +37,7 @@ function AgentsContent() {
         ))}
         
         {/* Add New Agent Card */}
-        <Card className="group h-full flex py-12 flex-col border-dashed border-border hover:bg-accent/5 hover:border-accent-foreground/20 transition-colors duration-200 cursor-pointer">
+        <Card className="group h-full flex py-9 flex-col border-dashed border-border hover:bg-accent/5 hover:border-accent-foreground/20 transition-colors duration-200 cursor-pointer">
           <CardContent className="flex flex-col items-center justify-center flex-1 p-8">
             <div className="w-12 h-12 rounded-full border-2 border-dashed border-muted-foreground/30 flex items-center justify-center mb-4 group-hover:border-accent-foreground/50 transition-colors">
               <Plus className="h-6 w-6 text-muted-foreground group-hover:text-accent-foreground transition-colors" />
