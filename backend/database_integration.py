@@ -19,13 +19,16 @@ class DatabaseIntegration:
         return self._db
 
     def save_agent(self, name: str, objective: str, model_provider: str = "cerebras",
-                   model_name: str = "llama-4-scout-17b-16e-instruct") -> str:
+                   model_name: str = "llama-4-scout-17b-16e-instruct",
+                   defense_system_prompt: str = None, iterations: int = None) -> str:
         """Save agent configuration to database"""
         agent_data = AgentModel(
             name=name,
             objective=objective,
             model_provider=model_provider,
             model_name=model_name,
+            defense_system_prompt=defense_system_prompt,
+            iterations=iterations,
             created_at=datetime.utcnow()
         )
 

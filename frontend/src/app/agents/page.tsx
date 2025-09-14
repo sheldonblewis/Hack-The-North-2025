@@ -131,13 +131,15 @@ export default async function AgentsPage() {
 
       {/* Add New Agent */}
       <div className="mt-12 pt-8 border-t border-border">
-        <Button 
-          variant="outline" 
-          className="w-full h-16 border-dashed border-border hover:bg-accent/5 hover:border-accent-foreground/20"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Agent
-        </Button>
+        <Link href="/agents/new">
+          <Button
+            variant="outline"
+            className="w-full h-16 border-dashed border-border hover:bg-accent/5 hover:border-accent-foreground/20"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Agent
+          </Button>
+        </Link>
       </div>
     </div>
     

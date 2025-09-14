@@ -42,6 +42,7 @@ export default function NewRun({
 }: {
   params: Promise<{ agentId: string }>;
 }) {
+  // Test run fields
   const [testName, setTestName] = useState("");
   const [description, setDescription] = useState("");
   const [targetEndpoint, setTargetEndpoint] = useState("");
@@ -107,7 +108,7 @@ export default function NewRun({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     createTestRun.mutate({
       agentId,
       name: testName,
@@ -126,7 +127,7 @@ export default function NewRun({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 mx-auto my-auto">
+    <div className="space-y-2 mx-auto my-auto">
       <Tabs defaultValue="basic" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="basic">Basic Info</TabsTrigger>
@@ -135,8 +136,8 @@ export default function NewRun({
           <TabsTrigger value="advanced">Advanced Settings</TabsTrigger>
         </TabsList>
 
-        {/* Basic Information */}
         <TabsContent value="basic" className="space-y-4">
+          <form onSubmit={handleSubmit}>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -183,9 +184,9 @@ export default function NewRun({
               </div>
             </CardContent>
           </Card>
+          </form>
         </TabsContent>
 
-        {/* Risk Categories */}
         <TabsContent value="risks" className="space-y-4">
           <Card>
             <CardHeader>
@@ -219,7 +220,6 @@ export default function NewRun({
           </Card>
         </TabsContent>
 
-        {/* Attack Strategies */}
         <TabsContent value="attacks" className="space-y-4">
           <Card>
             <CardHeader>
@@ -280,8 +280,8 @@ export default function NewRun({
           </Card>
         </TabsContent>
 
-        {/* Advanced Settings */}
         <TabsContent value="advanced" className="space-y-4">
+          <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -378,24 +378,22 @@ export default function NewRun({
               />
             </CardContent>
           </Card>
+            <div className="flex justify-end space-x-4 mt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={!testName || !targetEndpoint || selectedRisks.length === 0}>
+                Create Test Run
+              </Button>
+            </div>
+          </form>
         </TabsContent>
       </Tabs>
 
-      {/* Submit Button */}
-      <div className="flex justify-end space-x-4">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={handleCancel}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={!testName || !targetEndpoint || selectedRisks.length === 0}>
-          Create Test Run
-        </Button>
-      </div>
-
-      {/* Cancel Confirmation Dialog */}
       {showCancelDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md mx-4">
@@ -404,14 +402,14 @@ export default function NewRun({
               You have unsaved changes. Are you sure you want to cancel and lose your progress?
             </p>
             <div className="flex justify-end space-x-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setShowCancelDialog(false)}
               >
                 Keep Editing
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={confirmCancel}
               >
                 Discard Changes
@@ -420,7 +418,7 @@ export default function NewRun({
           </div>
         </div>
       )}
-    </form>
+    </div>
     
   );
 }

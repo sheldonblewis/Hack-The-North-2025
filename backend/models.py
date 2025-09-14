@@ -11,6 +11,8 @@ class AgentModel:
     model_provider: str
     model_name: str
     status: str = "active"
+    defense_system_prompt: Optional[str] = None
+    iterations: Optional[int] = None
     user_id: Optional[str] = None
     created_at: Optional[datetime] = None
     _id: Optional[ObjectId] = None
