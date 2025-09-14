@@ -13,11 +13,22 @@ co = cohere.ClientV2(COHERE_API_KEY)
 cereb = Cerebras(api_key=CEREBRAS_API_KEY)
 
 
-def cohere_stream_chat(prompt: str):
+def cohere_stream_chat(prompt: str, system_prompt:str = None):
+    # response = co.chat_stream(
+    #     model="command-r7b-12-2024",
+    #         messages=[{"role": "user", "content": prompt}],
+    # )
+
+    messages_list = []
+    if system_prompt:
+        messages_list.append({"role": "system", "content": system_prompt})
+    messages_list.append({"role": "user", "content": prompt})
+    
     response = co.chat_stream(
-        model="command-r7b-12-2024",
-            messages=[{"role": "user", "content": prompt}],
+            model="command-light",
+            messages=messages_list
     )
+    
 
     for event in response:
         if event.type == "content-delta":
@@ -60,4 +71,5 @@ def cerebras_stream_chat(prompt: str, system_prompt: str = None, model_name :str
 
 
 if __name__ == "__main__":
-    cohere_stream_chat("Hey how are you doing?")
+    system_prompt = "You are very helpful"
+    cohere_stream_chat(prompt="Hey how are you doing?", system_prompt=system_prompt)
