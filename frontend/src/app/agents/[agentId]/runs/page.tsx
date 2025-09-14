@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { CheckCircle, OctagonX, TriangleAlert, Info } from "lucide-react";
 
-export default function AgentRuns({
+export default async function AgentRuns({
   params,
 }: {
   params: Promise<{ agentId: string }>;
 }) {
+  const { agentId } = await params;
+
   return (
     <div className="space-y-6">
       {/* Status Cards Row */}
@@ -89,7 +91,7 @@ export default function AgentRuns({
             </div>
             <div className="">
               <Button asChild className="w-full">
-                <Link href={`/agents/${(params as any).agentId}/runs/new`}>
+                <Link href={`/agents/${agentId}/runs/new`}>
                   Run New Test
                 </Link>
               </Button>

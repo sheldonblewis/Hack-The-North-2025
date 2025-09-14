@@ -98,6 +98,68 @@ class ApiClient {
     });
   }
 
+  async *runStreamingSimulation(agentId: string, config: SimulationRequest): AsyncGenerator<any, void, unknown> {
+    const response = await fetch(`${API_BASE}/api/agents/${agentId}/simulate/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'text/event-stream',
+      },
+      body: JSON.stringify(config),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    if (!response.body) {
+      throw new Error('No response body available for streaming');
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        // Decode the chunk and add to buffer
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process complete lines in the buffer
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Keep incomplete line in buffer
+
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+
+          // Skip empty lines and comments
+          if (!trimmedLine || trimmedLine.startsWith(':')) {
+            continue;
+          }
+
+          // Parse Server-Sent Events format
+          if (trimmedLine.startsWith('data: ')) {
+            try {
+              const jsonData = trimmedLine.slice(6); // Remove 'data: ' prefix
+              const parsed = JSON.parse(jsonData);
+              yield parsed;
+            } catch (e) {
+              console.warn('Failed to parse streaming data:', trimmedLine, e);
+            }
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
   async healthCheck(): Promise<{ status: string; timestamp: string; service: string }> {
     return this.request<{ status: string; timestamp: string; service: string }>('/health');
   }
