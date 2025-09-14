@@ -27,6 +27,7 @@ export default function NewRun({
 }: {
   params: Promise<{ agentId: string }>;
 }) {
+  // Test run fields
   const [testName, setTestName] = useState("");
   const [description, setDescription] = useState("");
   const [targetEndpoint, setTargetEndpoint] = useState("");
@@ -207,14 +208,14 @@ export default function NewRun({
               You have unsaved changes. Are you sure you want to cancel and lose your progress?
             </p>
             <div className="flex justify-end space-x-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setShowCancelDialog(false)}
               >
                 Keep Editing
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={confirmCancel}
               >
                 Discard Changes
@@ -224,6 +225,5 @@ export default function NewRun({
         </div>
       )}
     </form>
-    
   );
 }

@@ -4,6 +4,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Plus } from "lucide-react";
 import { useAgent } from "~/contexts/agent-context";
 import { AgentCard } from "~/components/agent-card";
+import Link from "next/link";
 
 function AgentsContent() {
   const { agents } = useAgent();
@@ -35,7 +36,6 @@ function AgentsContent() {
         {agents.map((agent) => (
           <AgentCard key={agent.id} agent={agent} />
         ))}
-        
         {/* Add New Agent Card */}
         <Card className="group h-full flex py-9 flex-col border-dashed border-border hover:bg-accent/5 hover:border-accent-foreground/20 transition-colors duration-200 cursor-pointer">
           <CardContent className="flex flex-col items-center justify-center flex-1 p-8">
@@ -43,9 +43,9 @@ function AgentsContent() {
               <Plus className="h-6 w-6 text-muted-foreground group-hover:text-accent-foreground transition-colors" />
             </div>
             <div className="text-center">
-              <div className="font-medium text-muted-foreground group-hover:text-accent-foreground transition-colors mb-1">
+              <Link href="/agents/new" className="font-medium text-muted-foreground group-hover:text-accent-foreground transition-colors mb-1">
                 Add New Agent
-              </div>
+              </Link>
               <div className="text-sm text-muted-foreground/70">
                 Create a new AI agent for testing
               </div>
